@@ -1,0 +1,56 @@
+# Media files (2TB external drive mount)
+media/
+
+# Environment files (secrets)
+.env
+*.env
+.env.*
+
+# Docker volumes and runtime data
+volumes/
+data/
+**/volumes/
+**/data/
+
+# Portainer runtime directories and database (permission denied)
+docker/portainer/docker_config/
+docker/portainer/bin/
+docker/portainer/compose/
+docker/portainer/chisel/
+docker/portainer/certs/
+docker/portainer/tls/
+docker/portainer/portainer.db
+docker/portainer/portainer.db-*
+docker/portainer/portainer.key
+docker/portainer/portainer.pub
+
+# TeamSpeak backup files (permission denied)
+docker/teamspeak_backup/files/
+
+# Log files
+*.log
+logs/
+**/logs/
+
+# Editor configurations
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary and cache files
+tmp/
+temp/
+*.tmp
+*.cache
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+Thumbs.db
+.Spotlight-V100
+.Trashes
