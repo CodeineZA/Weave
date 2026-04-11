@@ -50,6 +50,12 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Database runtime files
+*.sqlite-shm
+*.sqlite-wal
+*.db-shm
+*.db-wal
+
 # OS files
 Thumbs.db
 .Spotlight-V100
