@@ -20,7 +20,7 @@ function clientError(action, error) {
     console.error(`%c[CLIENT ${ts}] ❌ ${action}`, 'color:#ff4444; font-weight:bold', error);
 }
 
-// State
+// State of things
 let ws = null;
 let myUsername = null;
 let roomPassword = null;
