@@ -1,0 +1,66 @@
+Project Architecture & AI Vibe-Coding Instructions: Covert VoIP Network
+Project Overview & Architectural Vision
+This document serves as the master blueprint and instruction set for an AI programming assistant. The objective is to architect and code a private, self-hosted VoIP and screen-sharing application designed to replace intrusive commercial platforms. As the Solutions Architect driving this project, you will feed these instructions to the AI to execute the development in structured phases.
+Core Constraints & Requirements:
+Feature Set: Voice channels and screen sharing only. Zero text-based chat functionality to ensure strict scope and privacy.
+Deployment Pipeline: Initial development and local testing on a primary workstation, with a seamless Stage-2 migration to a lightweight ARM64 environment (Raspberry Pi).
+Networking: All external access will be routed securely via Cloudflare Tunnels to avoid opening local firewall ports and to obfuscate the origin IP.
+1. Recommended Technology Stack
+Component
+Recommended Technology
+Architectural Rationale
+ 
+Frontend/Client
+React + Vite (Web) or Tauri (Desktop)
+Tauri provides a highly performant, lightweight desktop client using native web views, avoiding the heavy memory overhead of Electron.
+Signaling Server
+Node.js with WebSockets (Socket.io) or Go
+Required to negotiate WebRTC connections between clients. Node.js is easy to vibe-code, while Go offers maximum performance on ARM64 hardware.
+Media Protocol
+WebRTC (Peer-to-Peer Mesh or lightweight SFU)
+WebRTC is the industry standard for real-time, low-latency audio/video. P2P mesh is fine for small groups (under 5 users); a lightweight SFU (like mediasoup) is better for larger channels and screen sharing.
+Containerization
+Docker & Docker Compose
+Crucial for environment parity. Containerizing the signaling server ensures it runs identically on the initial dev machine and the target ARM64 board.
+Networking
+Cloudflare Tunnels (cloudflared)
+Provides a secure, encrypted ingress to the self-hosted server without exposing public IPs or opening router ports.
+
+2. The AI Vibe-Coding Prompt Sequence
+Feed the following prompts to your coding AI sequentially. Do not move to the next prompt until the AI has successfully delivered and you have tested the current phase.
+Phase 1: Foundation & Infrastructure
+System Role Prompt:
+"You are an expert Senior Full-Stack Developer specializing in WebRTC, real-time communications, and containerized deployments. I am the Solutions Architect. We are building a private, secure VoIP and screen-share app. There are NO text channels. We will build this in Docker so I can easily migrate it from my local machine to a Raspberry Pi (ARM64) later. External routing will be handled via Cloudflare Tunnels. 
+
+Task 1: Scaffold a basic Node.js + WebSockets (Socket.io) signaling server and a minimal React frontend. 
+- Provide the `Dockerfile` and `docker-compose.yml` for the backend.
+- Ensure the Docker setup uses multi-architecture friendly base images (e.g., `node:18-alpine`).
+- Provide the basic boilerplate to connect the React frontend to the WebSocket server."
+
+
+Phase 2: Audio Channels & WebRTC Signaling
+Task 2: Implement the WebRTC signaling logic for audio channels.
+- Create a UI with 'Rooms' or 'Channels'.
+- When a user joins a room, the signaling server must broadcast their presence to others in the room.
+- Implement the WebRTC exchange: Create Offers, Answers, and ICE Candidate exchanges via WebSockets.
+- Use `getUserMedia` to capture the microphone.
+- Establish a Peer-to-Peer mesh network for audio streaming between users in the same channel.
+- Implement mute/unmute toggles on the frontend."
+
+
+Phase 3: Screen Share Architecture (Stage 2 Integration)
+Task 3: We are now adding the screen-share functionality. Because we established standard WebRTC peer connections for audio, we will now add video tracks to those existing peer connections.
+- Implement a 'Share Screen' button on the frontend.
+- Use `getDisplayMedia` to capture the user's screen.
+- Write the logic to dynamically add this new video track to the active WebRTC Peer Connections for all users in the channel.
+- Handle the renegotiation step (sending a new WebRTC offer/answer) when a screen share is added or removed.
+- Create a video player component in the UI that dynamically renders the incoming screen share track."
+
+
+Phase 4: Migration & Networking
+Task 4: The local tests are passing. We need to prepare the deployment for the target edge device and configure external access.
+- Provide instructions on setting up a Cloudflare Tunnel (`cloudflared`) alongside our existing `docker-compose.yml`.
+- We need to route a custom domain through Cloudflare to the local Docker container port.
+- How do we handle STUN/TURN server requirements for WebRTC now that the clients will be connecting over the wider internet? Provide a configuration for a lightweight STUN/TURN server (like Coturn) if necessary to punch through strict NATs."
+
+
