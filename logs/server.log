@@ -1,0 +1,64 @@
+[2026-05-17 13:47:22] SYSTEM          | SERVER_START              | Listening on port 3000 | Password protected
+[2026-05-17 13:47:41] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 1
+[2026-05-17 13:47:44] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 13:47:45] poepoe          | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 13:47:45] poepoe          | JOIN_SUCCESS              | Room now: poepoe
+[2026-05-17 13:47:50] hentito         | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 13:47:50] hentito         | JOIN_SUCCESS              | Room now: poepoe, hentito
+[2026-05-17 13:47:50] hentito         | BROADCAST                 | user_joined → poepoe
+[2026-05-17 13:47:50] hentito         | OFFER                     | → poepoe | SDP
+[2026-05-17 13:47:50] hentito         | FORWARDED                 | offer to poepoe
+[2026-05-17 13:47:50] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:47:50] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:47:50] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:47:50] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:47:50] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:47:50] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:47:50] poepoe          | ANSWER                    | → hentito | SDP
+[2026-05-17 13:47:51] poepoe          | FORWARDED                 | answer to hentito
+[2026-05-17 13:47:51] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:47:51] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:47:51] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:47:51] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:47:51] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:47:51] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:47:51] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:47:51] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:47:51] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:47:51] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:47:51] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:47:51] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:47:51] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:47:51] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:48:51] poepoe          | DISCONNECT                | Code: 1006 | Duration: 66s | Remaining: poepoe, hentito
+[2026-05-17 13:48:51] poepoe          | BROADCAST                 | user_left → hentito
+[2026-05-17 13:48:53] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 13:48:53] poepoe          | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 13:48:53] poepoe          | JOIN_SUCCESS              | Room now: hentito, poepoe
+[2026-05-17 13:48:53] poepoe          | BROADCAST                 | user_joined → hentito
+[2026-05-17 13:48:53] poepoe          | OFFER                     | → hentito | SDP
+[2026-05-17 13:48:53] poepoe          | FORWARDED                 | offer to hentito
+[2026-05-17 13:48:53] hentito         | ANSWER                    | → poepoe | SDP
+[2026-05-17 13:48:53] hentito         | FORWARDED                 | answer to poepoe
+[2026-05-17 13:48:53] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:48:53] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:48:53] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:48:53] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:48:53] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:48:53] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:48:53] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:48:53] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:48:53] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:48:53] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:48:53] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:48:53] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:48:53] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:48:53] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:48:53] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:48:53] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:48:53] hentito         | ICE_CANDIDATE             | → poepoe | candidate
+[2026-05-17 13:48:53] hentito         | FORWARDED                 | ice_candidate to poepoe
+[2026-05-17 13:48:53] poepoe          | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 13:48:53] poepoe          | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 13:49:19] poepoe          | DISCONNECT                | Code: 1005 | Duration: 26s | Remaining: hentito, poepoe
+[2026-05-17 13:49:19] poepoe          | BROADCAST                 | user_left → hentito
