@@ -11,12 +11,22 @@ const SERVER_PASSWORD = process.env.SERVER_PASSWORD || 'password123';
 const PORT = parseInt(process.env.PORT) || 3000;
 
 const ICE_SERVERS = [
-    { urls: 'stun:stun.l.google.com:19302' }
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
 ];
 
 if (process.env.TURN_URL) {
     ICE_SERVERS.push({
         urls: process.env.TURN_URL,
+        username: process.env.TURN_USERNAME,
+        credential: process.env.TURN_CREDENTIAL
+    });
+}
+
+// Optional second TURN (TCP)
+if (process.env.TURN_URL2) {
+    ICE_SERVERS.push({
+        urls: process.env.TURN_URL2,
         username: process.env.TURN_USERNAME,
         credential: process.env.TURN_CREDENTIAL
     });
