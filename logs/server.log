@@ -62,3 +62,187 @@
 [2026-05-17 13:48:53] poepoe          | FORWARDED                 | ice_candidate to hentito
 [2026-05-17 13:49:19] poepoe          | DISCONNECT                | Code: 1005 | Duration: 26s | Remaining: hentito, poepoe
 [2026-05-17 13:49:19] poepoe          | BROADCAST                 | user_left → hentito
+[2026-05-17 13:51:00] SYSTEM          | SERVER_START              | Listening on port 3000 | Password protected
+[2026-05-17 13:51:09] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 1
+[2026-05-17 13:51:09] hentus          | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 13:51:09] hentus          | JOIN_SUCCESS              | Room now: hentus
+[2026-05-17 13:51:24] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 13:51:25] wat             | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 13:51:25] wat             | JOIN_SUCCESS              | Room now: hentus, wat
+[2026-05-17 13:51:25] wat             | BROADCAST                 | user_joined → hentus
+[2026-05-17 13:51:25] wat             | OFFER                     | → hentus | SDP
+[2026-05-17 13:51:25] wat             | FORWARDED                 | offer to hentus
+[2026-05-17 13:51:25] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:51:25] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:51:25] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:51:25] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:51:25] hentus          | ANSWER                    | → wat | SDP
+[2026-05-17 13:51:25] hentus          | FORWARDED                 | answer to wat
+[2026-05-17 13:51:25] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:51:25] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:51:25] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:51:25] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:51:25] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:51:25] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:51:25] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:51:25] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:51:25] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:51:25] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:51:25] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:51:25] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:51:25] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:51:25] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:51:25] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:51:25] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:52:25] wat             | DISCONNECT                | Code: 1006 | Duration: 60s | Remaining: hentus, wat
+[2026-05-17 13:52:25] wat             | BROADCAST                 | user_left → hentus
+[2026-05-17 13:52:28] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 13:52:28] wat             | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 13:52:28] wat             | JOIN_SUCCESS              | Room now: hentus, wat
+[2026-05-17 13:52:28] wat             | BROADCAST                 | user_joined → hentus
+[2026-05-17 13:52:28] wat             | OFFER                     | → hentus | SDP
+[2026-05-17 13:52:28] wat             | FORWARDED                 | offer to hentus
+[2026-05-17 13:52:28] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:52:28] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:52:28] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:52:28] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:52:28] hentus          | ANSWER                    | → wat | SDP
+[2026-05-17 13:52:28] hentus          | FORWARDED                 | answer to wat
+[2026-05-17 13:52:28] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:52:28] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:52:28] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:52:28] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:52:28] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:52:28] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:52:28] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:52:28] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:52:28] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:52:28] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:52:28] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:52:28] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:52:28] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 13:52:28] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 13:52:28] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 13:52:28] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 13:52:45] wat             | DISCONNECT                | Code: 1005 | Duration: 18s | Remaining: hentus, wat
+[2026-05-17 13:52:45] wat             | BROADCAST                 | user_left → hentus
+[2026-05-17 14:01:54] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 14:01:56] wat             | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 14:01:56] wat             | JOIN_SUCCESS              | Room now: hentus, wat
+[2026-05-17 14:01:56] wat             | BROADCAST                 | user_joined → hentus
+[2026-05-17 14:01:56] wat             | OFFER                     | → hentus | SDP
+[2026-05-17 14:01:56] wat             | FORWARDED                 | offer to hentus
+[2026-05-17 14:01:57] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 14:01:57] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 14:01:57] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 14:01:57] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 14:01:57] hentus          | ANSWER                    | → wat | SDP
+[2026-05-17 14:01:57] hentus          | FORWARDED                 | answer to wat
+[2026-05-17 14:01:57] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:01:57] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:01:57] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:01:57] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:01:57] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:01:57] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:01:57] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 14:01:57] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 14:01:57] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 14:01:57] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 14:01:57] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:01:57] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:01:57] hentus          | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:01:57] hentus          | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:01:57] wat             | ICE_CANDIDATE             | → hentus | candidate
+[2026-05-17 14:01:57] wat             | FORWARDED                 | ice_candidate to hentus
+[2026-05-17 14:02:10] hentus          | DISCONNECT                | Code: 1005 | Duration: 661s | Remaining: hentus, wat
+[2026-05-17 14:02:10] hentus          | BROADCAST                 | user_left → wat
+[2026-05-17 14:02:16] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 14:02:16] hentito         | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 14:02:16] hentito         | JOIN_SUCCESS              | Room now: wat, hentito
+[2026-05-17 14:02:16] hentito         | BROADCAST                 | user_joined → wat
+[2026-05-17 14:02:16] hentito         | OFFER                     | → wat | SDP
+[2026-05-17 14:02:16] hentito         | FORWARDED                 | offer to wat
+[2026-05-17 14:02:16] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:02:16] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:02:16] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:02:16] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:02:16] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:02:16] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:02:17] wat             | ANSWER                    | → hentito | SDP
+[2026-05-17 14:02:17] wat             | FORWARDED                 | answer to hentito
+[2026-05-17 14:02:17] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:02:17] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:02:17] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:02:17] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:02:17] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:02:17] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:02:17] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:02:17] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:02:17] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:02:17] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:02:17] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:02:17] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:02:17] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:02:17] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:03:17] wat             | DISCONNECT                | Code: 1006 | Duration: 80s | Remaining: wat, hentito
+[2026-05-17 14:03:17] wat             | BROADCAST                 | user_left → hentito
+[2026-05-17 14:03:19] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 14:03:19] wat             | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 14:03:19] wat             | JOIN_SUCCESS              | Room now: hentito, wat
+[2026-05-17 14:03:19] wat             | BROADCAST                 | user_joined → hentito
+[2026-05-17 14:03:19] wat             | OFFER                     | → hentito | SDP
+[2026-05-17 14:03:19] wat             | FORWARDED                 | offer to hentito
+[2026-05-17 14:03:19] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:03:19] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:03:19] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:03:19] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:03:19] hentito         | ANSWER                    | → wat | SDP
+[2026-05-17 14:03:19] hentito         | FORWARDED                 | answer to wat
+[2026-05-17 14:03:19] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:03:19] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:03:19] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:03:19] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:03:19] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:03:19] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:03:19] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:03:19] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:03:19] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:03:19] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:03:19] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:03:19] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:03:19] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:03:19] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:03:19] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:03:19] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:04:19] wat             | DISCONNECT                | Code: 1006 | Duration: 60s | Remaining: hentito, wat
+[2026-05-17 14:04:19] wat             | BROADCAST                 | user_left → hentito
+[2026-05-17 14:04:22] SYSTEM          | CONNECTION_OPEN           | IP: ::1 | Total clients: 2
+[2026-05-17 14:04:22] wat             | JOIN_ATTEMPT              | Password correct: true
+[2026-05-17 14:04:22] wat             | JOIN_SUCCESS              | Room now: hentito, wat
+[2026-05-17 14:04:22] wat             | BROADCAST                 | user_joined → hentito
+[2026-05-17 14:04:22] wat             | OFFER                     | → hentito | SDP
+[2026-05-17 14:04:22] wat             | FORWARDED                 | offer to hentito
+[2026-05-17 14:04:22] hentito         | ANSWER                    | → wat | SDP
+[2026-05-17 14:04:22] hentito         | FORWARDED                 | answer to wat
+[2026-05-17 14:04:22] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:04:22] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:04:22] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:04:22] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:04:22] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:04:22] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:04:22] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:04:22] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:04:22] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:04:22] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:04:22] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:04:22] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:04:22] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:04:22] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:04:22] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:04:22] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:04:22] hentito         | ICE_CANDIDATE             | → wat | candidate
+[2026-05-17 14:04:22] hentito         | FORWARDED                 | ice_candidate to wat
+[2026-05-17 14:04:22] wat             | ICE_CANDIDATE             | → hentito | candidate
+[2026-05-17 14:04:22] wat             | FORWARDED                 | ice_candidate to hentito
+[2026-05-17 14:04:48] wat             | DISCONNECT                | Code: 1005 | Duration: 26s | Remaining: hentito, wat
+[2026-05-17 14:04:48] wat             | BROADCAST                 | user_left → hentito
