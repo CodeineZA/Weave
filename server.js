@@ -82,6 +82,22 @@ const wss = new WebSocketServer({ server: httpServer });
 wss.on('connection', (ws, req) => {
     const ip = req.socket.remoteAddress || 'unknown';
     serverLog('SYSTEM', 'CONNECTION_OPEN', `IP: ${ip} | Total clients: ${wss.clients.size}`);
+
+    //add a ping to keep the socket alive and detect issues earlier
+    const pingInterval = setInterval(() => {
+        if (ws.readyState === 1) {
+            ws.ping();  // Send ping
+        }
+    }, 25000);  // every 25 seconds
+
+    ws.on('pong', () => {
+        // Client responded
+    });
+
+    ws.on('close', () => {
+        clearInterval(pingInterval);
+        // ... existing close logic
+    });
     
     ws.on('message', (raw) => {
         let msg;

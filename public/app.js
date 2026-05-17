@@ -265,6 +265,7 @@ async function initLocalMedia() {
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     ws = new WebSocket(`${protocol}//${window.location.host}`);
+    ws.on('ping', () => ws.pong ? ws.pong() : null);  // Some browsers need this
     
     ws.onopen = () => {
         clientLog('WS_CONNECTED', 'WebSocket open');
