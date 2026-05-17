@@ -26,13 +26,37 @@ function clientLog(action, details = '') {
   const entry = `[${getTimestamp()}] ${myUsername || 'joining'} - ${action} ${details}`;
   console.log(`%c${entry}`, 'color: #00d4ff; font-weight: bold;');
   logs.push(entry);
-  if (logs.length > 500) logs.shift(); // Keep last 500 logs
+  if (logs.length > 500) logs.shift();
 }
 
 window.showClientLogs = () => {
   console.log('=== CLIENT LOGS ===');
   logs.forEach(log => console.log(log));
   console.log('=== END LOGS ===');
+};
+
+window.getDiagnostics = async () => {
+  console.log('=== WEAVE DIAGNOSTICS ===');
+  console.log('WebSocket:', { readyState: ws?.readyState, connected: ws?.readyState === 1 });
+  console.log('Local Stream:', { id: localStream?.id, tracks: localStream?.getTracks().length });
+  console.log('Connected Users:', connectedUsers);
+  console.log('Peer Connections:', peerConnections.size);
+  
+  for (const [username, pc] of peerConnections.entries()) {
+    console.log(`Peer: ${username}`);
+    console.log('  Signaling State:', pc.signalingState);
+    console.log('  Connection State:', pc.connectionState);
+    console.log('  ICE Connection State:', pc.iceConnectionState);
+    console.log('  Senders:', pc.getSenders().length);
+    console.log('  Receivers:', pc.getReceivers().length);
+  }
+  
+  console.log('Audio Elements:', hiddenAudio.children.length);
+  for (let i = 0; i < hiddenAudio.children.length; i++) {
+    const audio = hiddenAudio.children[i];
+    console.log(`  Audio ${i}: paused=${audio.paused}, muted=${audio.muted}, volume=${audio.volume}`);
+  }
+  console.log('=== END DIAGNOSTICS ===');
 };
 // ===== END LOGGING =====
 
@@ -147,7 +171,6 @@ function addScreenToGrid(username, stream) {
 
     const container = document.createElement('div');
     container.className = 'screen-container';
-
     const video = document.createElement('video');
     video.autoplay = true;
     video.playsInline = true;
@@ -217,15 +240,19 @@ async function initLocalMedia() {
         });
         
         const audioTracks = localStream.getAudioTracks();
-        clientLog('MIC_CONNECTED', `Got ${audioTracks.length} audio track(s)`);
+        clientLog('MIC_CONNECTED', `Got ${audioTracks.length} audio track(s), streamID=${localStream.id}`);
         
         audioTracks.forEach((track, idx) => {
-          clientLog('AUDIO_TRACK', `Track ${idx}: ${track.label}, enabled=${track.enabled}`);
+          clientLog('AUDIO_TRACK', `Track ${idx}: id=${track.id}, label="${track.label}", enabled=${track.enabled}, state=${track.readyState}, kind=${track.kind}`);
         });
+        
+        if (audioTracks.length === 0) {
+          clientLog('MIC_WARNING', 'No audio tracks in stream');
+        }
         
         return true;
     } catch (err) {
-        clientLog('MIC_FAILED', err.message);
+        clientLog('MIC_FAILED', `${err.name}: ${err.message}`);
         joinError.textContent = 'Microphone access is required for voice chat.';
         return false;
     }
@@ -236,24 +263,36 @@ function createPeerConnection(peerUsername) {
         return peerConnections.get(peerUsername);
     }
 
+    clientLog('PEER_CREATE_START', `${peerUsername}, iceServers=${JSON.stringify(iceServers)}`);
     const pc = new RTCPeerConnection({ iceServers });
     peerConnections.set(peerUsername, pc);
-    clientLog('PEER_CREATED', peerUsername);
+    clientLog('PEER_CREATED', `${peerUsername}, signalingState=${pc.signalingState}`);
 
     if (localStream) {
+        clientLog('LOCAL_STREAM_INFO', `streamID=${localStream.id}, tracks=${localStream.getTracks().length}`);
         localStream.getTracks().forEach((track) => {
             pc.addTrack(track, localStream);
-            clientLog('TRACK_ADDED', `${track.kind} to ${peerUsername}`);
+            clientLog('TRACK_ADDED', `${track.kind} (id=${track.id}, enabled=${track.enabled}) to ${peerUsername}`);
         });
+    } else {
+        clientLog('LOCAL_STREAM_MISSING', `${peerUsername} peer has no local stream yet`);
     }
 
     pc.onicecandidate = (event) => {
-        if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-                type: 'ice_candidate',
-                to: peerUsername,
-                candidate: event.candidate
-            }));
+        if (event.candidate) {
+            clientLog('ICE_CANDIDATE_LOCAL', `${peerUsername}: ${event.candidate.candidate.split(' ')[7] || 'unknown'}`);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'ice_candidate',
+                    to: peerUsername,
+                    candidate: event.candidate
+                }));
+                clientLog('ICE_CANDIDATE_SENT', `${peerUsername}`);
+            } else {
+                clientLog('ICE_CANDIDATE_QUEUE_FAIL', `${peerUsername}: ws not open (state=${ws?.readyState})`);
+            }
+        } else {
+            clientLog('ICE_GATHERING_COMPLETE', peerUsername);
         }
     };
 
@@ -261,29 +300,39 @@ function createPeerConnection(peerUsername) {
         const track = event.track;
         const stream = event.streams[0] || new MediaStream([track]);
 
-        clientLog('TRACK_RECEIVED', `${track.kind} from ${peerUsername}`);
+        clientLog('TRACK_RECEIVED', `${track.kind} from ${peerUsername}, track.id=${track.id}, stream.id=${stream.id}`);
 
         if (track.kind === 'audio') {
+            clientLog('AUDIO_TRACK_RECEIVED', `${peerUsername}: enabled=${track.enabled}, readyState=${track.readyState}`);
+            
             const audio = document.createElement('audio');
             audio.autoplay = true;
-            audio.muted = false; // CRITICAL: Ensure audio is not muted
-            audio.volume = 1.0;  // Ensure full volume
+            audio.muted = false;
+            audio.volume = 1.0;
             audio.srcObject = stream;
             
+            clientLog('AUDIO_ELEMENT_CONFIG', `${peerUsername}: autoplay=${audio.autoplay}, muted=${audio.muted}, volume=${audio.volume}`);
+            
             audio.onloadedmetadata = () => {
-              clientLog('AUDIO_READY', `${peerUsername} audio elem ready, playing`);
+              clientLog('AUDIO_LOADED_METADATA', `${peerUsername}: duration=${audio.duration}, readyState=${audio.readyState}`);
+            };
+            
+            audio.onplay = () => {
+              clientLog('AUDIO_PLAY_EVENT', `${peerUsername}: currentTime=${audio.currentTime}`);
             };
             
             audio.onerror = (e) => {
-              clientLog('AUDIO_ERROR', `${peerUsername}: ${e.message}`);
+              clientLog('AUDIO_ERROR', `${peerUsername}: code=${audio.error?.code}, message=${audio.error?.message}`);
             };
             
-            audio.play().catch(err => {
-              clientLog('AUDIO_PLAY_FAILED', `${peerUsername}: ${err.message}`);
+            audio.play().then(() => {
+              clientLog('AUDIO_PLAY_SUCCESS', `${peerUsername}`);
+            }).catch(err => {
+              clientLog('AUDIO_PLAY_FAILED', `${peerUsername}: ${err.name}: ${err.message}`);
             });
             
             hiddenAudio.appendChild(audio);
-            clientLog('AUDIO_ELEMENT_CREATED', `${peerUsername} elem added, playing`);
+            clientLog('AUDIO_ELEMENT_APPENDED', `${peerUsername}: hiddenAudio.children=${hiddenAudio.children.length}`);
             startVoiceActivityDetection(peerUsername, stream);
         }
 
@@ -297,7 +346,7 @@ function createPeerConnection(peerUsername) {
     };
 
     pc.onconnectionstatechange = () => {
-        clientLog('PEER_STATE_CHANGE', `${peerUsername}: ${pc.connectionState}`);
+        clientLog('PEER_STATE_CHANGE', `${peerUsername}: ${pc.connectionState}, signalingState=${pc.signalingState}`);
         if (['failed', 'disconnected', 'closed'].includes(pc.connectionState)) {
             clientLog('PEER_DISCONNECTED', peerUsername);
             removeUser(peerUsername);
@@ -310,6 +359,13 @@ function createPeerConnection(peerUsername) {
 
     pc.oniceconnectionstatechange = () => {
       clientLog('ICE_CONNECTION', `${peerUsername}: ${pc.iceConnectionState}`);
+      if (pc.iceConnectionState === 'connected') {
+        clientLog('ICE_CONNECTED', `${peerUsername}: ICE connectivity established`);
+      }
+    };
+
+    pc.onsignalingstatechange = () => {
+      clientLog('SIGNALING_STATE_CHANGE', `${peerUsername}: ${pc.signalingState}`);
     };
 
     return pc;
@@ -340,8 +396,9 @@ function connectWebSocket() {
 
     ws.onopen = () => {
         reconnectAttempts = 0;
-        clientLog('WS_CONNECTED', 'Ready to join');
+        clientLog('WS_CONNECTED', 'WebSocket open, readyState=1');
         if (myUsername && roomPassword) {
+            clientLog('SEND_JOIN_MESSAGE', `username=${myUsername}`);
             ws.send(JSON.stringify({
                 type: 'join',
                 username: myUsername,
@@ -354,16 +411,17 @@ function connectWebSocket() {
 
     ws.onmessage = async (event) => {
         const msg = JSON.parse(event.data);
-        clientLog('MSG_RECEIVED', msg.type);
+        clientLog('MSG_RECEIVED', `${msg.type}${msg.from ? ` from ${msg.from}` : ''}`);
 
         if (msg.type === 'join_ack') {
             joined = true;
             iceServers = msg.iceServers || iceServers;
             connectedUsers = msg.users.map((u) => u.username);
-            clientLog('JOIN_ACK', `Users in room: ${connectedUsers.join(', ')}`);
+            clientLog('JOIN_ACK_RECEIVED', `Users: [${connectedUsers.join(', ')}], iceServers=${JSON.stringify(iceServers)}`);
 
             const mediaReady = await initLocalMedia();
             if (!mediaReady) {
+                clientLog('JOIN_FAILED', 'Media init failed');
                 return;
             }
 
@@ -374,10 +432,12 @@ function connectWebSocket() {
                 if (user === myUsername) {
                     continue;
                 }
+                clientLog('CREATING_INITIAL_PEER', user);
                 const pc = createPeerConnection(user);
                 clientLog('OFFER_CREATING', user);
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
+                clientLog('LOCAL_DESCRIPTION_SET', `${user}: signalingState=${pc.signalingState}`);
                 ws.send(JSON.stringify({ type: 'offer', to: user, offer: pc.localDescription }));
                 clientLog('OFFER_SENT', user);
             }
@@ -408,11 +468,14 @@ function connectWebSocket() {
         }
 
         if (msg.type === 'offer') {
+            clientLog('OFFER_RECEIVED_START', `from ${msg.from}`);
             const pc = createPeerConnection(msg.from);
-            clientLog('OFFER_RECEIVED', msg.from);
+            clientLog('OFFER_RECEIVED_PROCESS', `${msg.from}: signalingState=${pc.signalingState}`);
             await pc.setRemoteDescription(msg.offer);
+            clientLog('REMOTE_DESCRIPTION_SET', `${msg.from}: signalingState=${pc.signalingState}`);
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
+            clientLog('ANSWER_CREATED', `${msg.from}: signalingState=${pc.signalingState}`);
             ws.send(JSON.stringify({ type: 'answer', to: msg.from, answer: pc.localDescription }));
             clientLog('ANSWER_SENT', msg.from);
             return;
@@ -421,8 +484,11 @@ function connectWebSocket() {
         if (msg.type === 'answer') {
             const pc = peerConnections.get(msg.from);
             if (pc) {
-                clientLog('ANSWER_RECEIVED', msg.from);
+                clientLog('ANSWER_RECEIVED', `${msg.from}: signalingState=${pc.signalingState}`);
                 await pc.setRemoteDescription(msg.answer);
+                clientLog('ANSWER_REMOTE_DESCRIPTION_SET', `${msg.from}: signalingState=${pc.signalingState}`);
+            } else {
+                clientLog('ANSWER_RECEIVED_NO_PEER', msg.from);
             }
             return;
         }
@@ -430,18 +496,23 @@ function connectWebSocket() {
         if (msg.type === 'ice_candidate') {
             const pc = peerConnections.get(msg.from);
             if (pc) {
-                await pc.addIceCandidate(msg.candidate).catch(() => {});
+                clientLog('ICE_CANDIDATE_RECEIVED', `${msg.from}: ${msg.candidate.candidate.split(' ')[7] || 'unknown'}`);
+                await pc.addIceCandidate(msg.candidate).catch((err) => {
+                  clientLog('ICE_CANDIDATE_ADD_FAILED', `${msg.from}: ${err.message}`);
+                });
+            } else {
+                clientLog('ICE_CANDIDATE_NO_PEER', msg.from);
             }
             return;
         }
     };
 
     ws.onclose = (event) => {
-        clientLog('WS_CLOSED', `Code: ${event.code}, Clean: ${event.wasClean}`);
+        clientLog('WS_CLOSED', `Code: ${event.code}, Reason: "${event.reason}", Clean: ${event.wasClean}`);
         if (joined && reconnectAttempts < MAX_RECONNECT) {
             reconnectAttempts += 1;
             const delay = reconnectAttempts * 2000;
-            clientLog('WS_RECONNECT', `Attempt ${reconnectAttempts}, waiting ${delay}ms`);
+            clientLog('WS_RECONNECT', `Attempt ${reconnectAttempts}/${MAX_RECONNECT}, waiting ${delay}ms`);
             setTimeout(connectWebSocket, delay);
         } else if (joined) {
             clientLog('WS_RECONNECT_FAILED', 'Max attempts reached');
@@ -450,7 +521,7 @@ function connectWebSocket() {
     };
 
     ws.onerror = (err) => {
-      clientLog('WS_ERROR', err.message || 'Unknown');
+      clientLog('WS_ERROR', `${err.message || 'Unknown error'} (readyState=${ws.readyState})`);
       console.error('WebSocket error', err);
     };
 }
@@ -500,114 +571,82 @@ function stopScreenShare(fromBrowser = false) {
         screenStream = null;
     }
 
+    for (const [username, pc] of peerConnections.entries()) {
+        const senders = pc.getSenders();
+        for (const sender of senders) {
+            if (sender.track && sender.track.kind === 'video') {
+                pc.removeTrack(sender);
+            }
+        }
+        renegotiateConnection(username, pc);
+    }
+
     removeScreenFromGrid(myUsername);
     isScreenSharing = false;
     screenBtn.classList.remove('active');
     screenIcon.textContent = '📺';
     screenText.textContent = 'Share screen';
-    clientLog('SCREEN_SHARE_STOPPED', fromBrowser ? 'browser_button' : 'user_button');
+    clientLog('SCREEN_SHARE_STOPPED', fromBrowser ? 'by browser' : 'by user');
 }
 
 function toggleMute() {
-    if (!localStream) {
+    if (localStream) {
+        const audioTracks = localStream.getAudioTracks();
+        audioTracks.forEach((track) => {
+            track.enabled = !track.enabled;
+            isMuted = !track.enabled;
+        });
+
+        muteBtn.classList.toggle('active');
+        muteIcon.textContent = isMuted ? '🔇' : '🎤';
+        muteText.textContent = isMuted ? 'Unmute' : 'Mute';
+        clientLog('MUTE_TOGGLED', isMuted ? 'MUTED' : 'UNMUTED');
+    }
+}
+
+// ===== EVENT LISTENERS =====
+joinBtn.addEventListener('click', async () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!username) {
+        joinError.textContent = 'Please enter a username';
         return;
     }
-    isMuted = !isMuted;
-    localStream.getAudioTracks().forEach((track) => {
-        track.enabled = !isMuted;
-    });
-    muteBtn.classList.toggle('active', isMuted);
-    muteIcon.textContent = isMuted ? '🔇' : '🎤';
-    muteText.textContent = isMuted ? 'Unmute' : 'Mute';
-    clientLog('MUTE_TOGGLE', isMuted ? 'muted' : 'unmuted');
-}
 
-function leaveRoom() {
-    clientLog('LEAVE_ROOM', 'User initiated');
+    if (!password) {
+        joinError.textContent = 'Please enter the room password';
+        return;
+    }
+
+    myUsername = username;
+    roomPassword = password;
+    clientLog('JOIN_ATTEMPT', username);
+    connectWebSocket();
+});
+
+leaveBtn.addEventListener('click', () => {
     if (ws) {
+        clientLog('LEAVE_REQUESTED', myUsername);
         ws.close();
     }
-    joined = false;
-    pendingJoin = false;
+    location.reload();
+});
 
-    peerConnections.forEach((pc) => pc.close());
-    peerConnections.clear();
-    screenVideos.forEach((container) => container.remove());
-    screenVideos.clear();
-    voiceAnalysers.forEach(({ interval }) => clearInterval(interval));
-    voiceAnalysers.clear();
-
-    if (localStream) {
-        localStream.getTracks().forEach((track) => track.stop());
-        localStream = null;
-        clientLog('LOCAL_MEDIA_STOPPED', 'All tracks stopped');
+muteBtn.addEventListener('click', toggleMute);
+screenBtn.addEventListener('click', () => {
+    if (isScreenSharing) {
+        stopScreenShare();
+    } else {
+        startScreenShare();
     }
-    if (screenStream) {
-        screenStream.getTracks().forEach((track) => track.stop());
-        screenStream = null;
+});
+
+// Prevent form submission on enter
+document.getElementById('password').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        joinBtn.click();
     }
+});
 
-    roomScreen.classList.add('hidden');
-    joinScreen.classList.remove('hidden');
-    joinError.textContent = '';
-    connectedUsers = [];
-    updateUsersList();
-    checkEmptyState();
-}
-
-function init() {
-    clientLog('APP_INIT', 'Page loaded');
-    
-    joinBtn.addEventListener('click', () => {
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        if (!username) {
-            joinError.textContent = 'Please enter a name';
-            return;
-        }
-        if (!password) {
-            joinError.textContent = 'Password required';
-            return;
-        }
-
-        myUsername = username;
-        roomPassword = password;
-        joinError.textContent = '';
-        pendingJoin = true;
-        clientLog('JOIN_BUTTON_CLICKED', username);
-
-        if (!ws || ws.readyState !== WebSocket.OPEN) {
-            connectWebSocket();
-        } else {
-            ws.send(JSON.stringify({ type: 'join', username: myUsername, password: roomPassword }));
-            clientLog('JOIN_SENT', myUsername);
-        }
-    });
-
-    muteBtn.addEventListener('click', toggleMute);
-    screenBtn.addEventListener('click', () => {
-        if (isScreenSharing) {
-            stopScreenShare();
-        } else {
-            startScreenShare();
-        }
-    });
-    leaveBtn.addEventListener('click', leaveRoom);
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === '/' && document.activeElement.tagName !== 'INPUT') {
-            event.preventDefault();
-            toggleMute();
-            clientLog('MUTE_HOTKEY', '/');
-        }
-    });
-
-    window.addEventListener('beforeunload', () => {
-        if (ws) {
-            ws.close();
-        }
-    });
-}
-
-window.addEventListener('load', init);
+clientLog('INIT_COMPLETE', 'App ready');

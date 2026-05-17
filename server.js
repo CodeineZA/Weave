@@ -129,54 +129,55 @@ wss.on('connection', (ws) => {
     if (msg.type === 'offer') {
       const targetEntry = Array.from(users.entries()).find(([, u]) => u.username === msg.to);
       if (!targetEntry) {
-        serverLog(fromUser, 'OFFER_FAILED', `Target ${msg.to} not found`);
+        serverLog(fromUser, 'OFFER_ROUTE_FAIL', `Target "${msg.to}" not found in room`);
         return;
       }
       
       const [targetWs] = targetEntry;
       if (targetWs.readyState !== targetWs.OPEN) {
-        serverLog(fromUser, 'OFFER_FAILED', `Target ${msg.to} connection closed`);
+        serverLog(fromUser, 'OFFER_ROUTE_FAIL', `Target "${msg.to}" connection not OPEN (state=${targetWs.readyState})`);
         return;
       }
 
       targetWs.send(JSON.stringify({ ...msg, from: fromUser }));
-      serverLog(fromUser, 'OFFER_SENT', `to ${msg.to}`);
+      serverLog(fromUser, 'OFFER_ROUTED', `to ${msg.to}`);
       return;
     }
 
     if (msg.type === 'answer') {
       const targetEntry = Array.from(users.entries()).find(([, u]) => u.username === msg.to);
       if (!targetEntry) {
-        serverLog(fromUser, 'ANSWER_FAILED', `Target ${msg.to} not found`);
+        serverLog(fromUser, 'ANSWER_ROUTE_FAIL', `Target "${msg.to}" not found in room`);
         return;
       }
       
       const [targetWs] = targetEntry;
       if (targetWs.readyState !== targetWs.OPEN) {
-        serverLog(fromUser, 'ANSWER_FAILED', `Target ${msg.to} connection closed`);
+        serverLog(fromUser, 'ANSWER_ROUTE_FAIL', `Target "${msg.to}" connection not OPEN (state=${targetWs.readyState})`);
         return;
       }
 
       targetWs.send(JSON.stringify({ ...msg, from: fromUser }));
-      serverLog(fromUser, 'ANSWER_SENT', `to ${msg.to}`);
+      serverLog(fromUser, 'ANSWER_ROUTED', `to ${msg.to}`);
       return;
     }
 
     if (msg.type === 'ice_candidate') {
       const targetEntry = Array.from(users.entries()).find(([, u]) => u.username === msg.to);
       if (!targetEntry) {
-        serverLog(fromUser, 'ICE_CANDIDATE_FAILED', `Target ${msg.to} not found`);
+        serverLog(fromUser, 'ICE_ROUTE_FAIL', `Target "${msg.to}" not found in room`);
         return;
       }
 
       const [targetWs] = targetEntry;
       if (targetWs.readyState !== targetWs.OPEN) {
-        serverLog(fromUser, 'ICE_CANDIDATE_FAILED', `Target ${msg.to} connection closed`);
+        serverLog(fromUser, 'ICE_ROUTE_FAIL', `Target "${msg.to}" connection not OPEN (state=${targetWs.readyState})`);
         return;
       }
 
       targetWs.send(JSON.stringify({ ...msg, from: fromUser }));
-      serverLog(fromUser, 'ICE_CANDIDATE_FWD', `to ${msg.to} - candidate type: ${msg.candidate?.candidate?.split(' ')[7] || 'unknown'}`);
+      const candType = msg.candidate?.candidate?.split(' ')[7] || 'unknown';
+      serverLog(fromUser, 'ICE_ROUTED', `to ${msg.to} (type=${candType})`);
       return;
     }
 
@@ -214,7 +215,7 @@ wss.on('connection', (ws) => {
 
   ws.on('error', (err) => {
     const username = users.get(ws)?.username || 'UNKNOWN';
-    serverLog(username, 'WS_ERROR', err.message);
+    serverLog(username, 'WS_ERROR', `${err.name}: ${err.message}`);
   });
 });
 

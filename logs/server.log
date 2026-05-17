@@ -1,0 +1,142 @@
+[2026-05-17 06:28:43] SYSTEM - SERVER_START Listening on port 3000
+[2026-05-17 06:30:01] SYSTEM - SERVER_START Listening on port 3000
+[2026-05-17 06:30:44] SYSTEM - SERVER_START Listening on port 3000
+[2026-05-17 06:34:41] SYSTEM - WS_CONNECT New connection. Total users: 0
+[2026-05-17 06:34:41] Alice - JOIN_SUCCESS Room now has: Alice
+[2026-05-17 06:34:57] SYSTEM - WS_CONNECT New connection. Total users: 1
+[2026-05-17 06:34:57] hent - JOIN_SUCCESS Room now has: Alice, hent
+[2026-05-17 06:34:57] hent - BROADCAST_JOIN Notified Alice
+[2026-05-17 06:34:57] hent - OFFER_ROUTED to Alice
+[2026-05-17 06:34:57] hent - ICE_ROUTED to Alice (type=host)
+[2026-05-17 06:34:57] hent - ICE_ROUTED to Alice (type=host)
+[2026-05-17 06:34:57] hent - ICE_ROUTED to Alice (type=srflx)
+[2026-05-17 06:34:57] hent - ICE_ROUTED to Alice (type=host)
+[2026-05-17 06:34:57] hent - ICE_ROUTED to Alice (type=host)
+[2026-05-17 06:34:58] Alice - ANSWER_ROUTED to hent
+[2026-05-17 06:34:58] Alice - ICE_ROUTED to hent (type=host)
+[2026-05-17 06:35:10] SYSTEM - WS_CONNECT New connection. Total users: 2
+[2026-05-17 06:35:10] Alice - JOIN_FAILED Username already taken
+[2026-05-17 06:35:13] SYSTEM - WS_CONNECT New connection. Total users: 2
+[2026-05-17 06:35:13] Alice1 - JOIN_SUCCESS Room now has: Alice, hent, Alice1
+[2026-05-17 06:35:13] Alice1 - BROADCAST_JOIN Notified Alice
+[2026-05-17 06:35:13] Alice1 - BROADCAST_JOIN Notified hent
+[2026-05-17 06:35:13] Alice1 - BROADCAST_JOIN Notified unknown
+[2026-05-17 06:35:41] Alice1 - DISCONNECT Intentional close. Room now has: Alice, hent
+[2026-05-17 06:35:41] Alice1 - BROADCAST_LEAVE Notified Alice
+[2026-05-17 06:35:41] Alice1 - BROADCAST_LEAVE Notified hent
+[2026-05-17 06:35:41] Alice1 - BROADCAST_LEAVE Notified unknown
+[2026-05-17 06:35:41] SYSTEM - WS_CLOSE Unjoined connection closed
+[2026-05-17 06:35:41] Alice - DISCONNECT Intentional close. Room now has: hent
+[2026-05-17 06:35:41] Alice - BROADCAST_LEAVE Notified hent
+[2026-05-17 06:54:39] hent - DISCONNECT Intentional close. Room now has: empty
+[2026-05-17 06:59:32] SYSTEM - SERVER_START Listening on port 3000
+[2026-05-17 06:59:54] SYSTEM - WS_CONNECT New connection. Total users: 0
+[2026-05-17 06:59:54] Hentus 01 - JOIN_SUCCESS Room now has: Hentus 01
+[2026-05-17 07:00:55] SYSTEM - WS_CONNECT New connection. Total users: 1
+[2026-05-17 07:00:55] Hentus foon - JOIN_SUCCESS Room now has: Hentus 01, Hentus foon
+[2026-05-17 07:00:55] Hentus foon - BROADCAST_JOIN Notified Hentus 01
+[2026-05-17 07:00:56] Hentus foon - OFFER_ROUTED to Hentus 01
+[2026-05-17 07:00:56] Hentus foon - ICE_ROUTED to Hentus 01 (type=host)
+[2026-05-17 07:00:56] Hentus foon - ICE_ROUTED to Hentus 01 (type=host)
+[2026-05-17 07:00:56] Hentus foon - ICE_ROUTED to Hentus 01 (type=host)
+[2026-05-17 07:00:56] Hentus 01 - ANSWER_ROUTED to Hentus foon
+[2026-05-17 07:00:56] Hentus 01 - ICE_ROUTED to Hentus foon (type=host)
+[2026-05-17 07:00:56] Hentus 01 - ICE_ROUTED to Hentus foon (type=host)
+[2026-05-17 07:00:56] Hentus foon - ICE_ROUTED to Hentus 01 (type=host)
+[2026-05-17 07:00:56] Hentus 01 - ICE_ROUTED to Hentus foon (type=srflx)
+[2026-05-17 07:00:56] Hentus foon - ICE_ROUTED to Hentus 01 (type=srflx)
+[2026-05-17 07:01:01] Hentus foon - DISCONNECT Intentional close. Room now has: Hentus 01
+[2026-05-17 07:01:01] Hentus foon - BROADCAST_LEAVE Notified Hentus 01
+[2026-05-17 07:06:20] Hentus 01 - DISCONNECT Intentional close. Room now has: empty
+[2026-05-17 07:06:27] SYSTEM - WS_CONNECT New connection. Total users: 0
+[2026-05-17 07:06:27] Hentus_01 - JOIN_SUCCESS Room now has: Hentus_01
+[2026-05-17 07:06:43] SYSTEM - WS_CONNECT New connection. Total users: 1
+[2026-05-17 07:06:43] TRIBBES - JOIN_SUCCESS Room now has: Hentus_01, TRIBBES
+[2026-05-17 07:06:43] TRIBBES - BROADCAST_JOIN Notified Hentus_01
+[2026-05-17 07:06:47] TRIBBES - OFFER_ROUTED to Hentus_01
+[2026-05-17 07:06:47] Hentus_01 - ANSWER_ROUTED to TRIBBES
+[2026-05-17 07:06:47] Hentus_01 - ICE_ROUTED to TRIBBES (type=host)
+[2026-05-17 07:06:47] Hentus_01 - ICE_ROUTED to TRIBBES (type=host)
+[2026-05-17 07:06:47] Hentus_01 - ICE_ROUTED to TRIBBES (type=srflx)
+[2026-05-17 07:06:47] TRIBBES - ICE_ROUTED to Hentus_01 (type=host)
+[2026-05-17 07:06:47] TRIBBES - ICE_ROUTED to Hentus_01 (type=srflx)
+[2026-05-17 07:06:47] Hentus_01 - ICE_ROUTED to TRIBBES (type=host)
+[2026-05-17 07:06:47] Hentus_01 - ICE_ROUTED to TRIBBES (type=host)
+[2026-05-17 07:06:47] TRIBBES - ICE_ROUTED to Hentus_01 (type=host)
+[2026-05-17 07:07:05] TRIBBES - DISCONNECT Intentional close. Room now has: Hentus_01
+[2026-05-17 07:07:05] TRIBBES - BROADCAST_LEAVE Notified Hentus_01
+[2026-05-17 07:07:06] Hentus_01 - DISCONNECT Intentional close. Room now has: empty
+[2026-05-17 07:07:24] SYSTEM - SERVER_START Listening on port 3000
+[2026-05-17 07:07:37] SYSTEM - WS_CONNECT New connection. Total users: 0
+[2026-05-17 07:07:37] Tribbes 2 - JOIN_SUCCESS Room now has: Tribbes 2
+[2026-05-17 07:07:48] SYSTEM - WS_CONNECT New connection. Total users: 1
+[2026-05-17 07:07:49] hentus - JOIN_SUCCESS Room now has: Tribbes 2, hentus
+[2026-05-17 07:07:49] hentus - BROADCAST_JOIN Notified Tribbes 2
+[2026-05-17 07:07:52] hentus - OFFER_ROUTED to Tribbes 2
+[2026-05-17 07:07:52] hentus - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:07:52] hentus - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:07:52] hentus - ICE_ROUTED to Tribbes 2 (type=srflx)
+[2026-05-17 07:07:52] Tribbes 2 - ANSWER_ROUTED to hentus
+[2026-05-17 07:07:52] Tribbes 2 - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:07:52] Tribbes 2 - ICE_ROUTED to hentus (type=srflx)
+[2026-05-17 07:07:52] hentus - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:07:52] hentus - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:07:52] Tribbes 2 - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:22] SYSTEM - WS_CONNECT New connection. Total users: 2
+[2026-05-17 07:08:22] Foon - JOIN_FAILED Wrong password
+[2026-05-17 07:08:29] SYSTEM - WS_CONNECT New connection. Total users: 2
+[2026-05-17 07:08:29] Foon - JOIN_SUCCESS Room now has: Tribbes 2, hentus, Foon
+[2026-05-17 07:08:29] Foon - BROADCAST_JOIN Notified Tribbes 2
+[2026-05-17 07:08:29] Foon - BROADCAST_JOIN Notified hentus
+[2026-05-17 07:08:29] Foon - BROADCAST_JOIN Notified unknown
+[2026-05-17 07:08:30] Foon - OFFER_ROUTED to Tribbes 2
+[2026-05-17 07:08:30] Foon - OFFER_ROUTED to hentus
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=srflx)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=srflx)
+[2026-05-17 07:08:30] Tribbes 2 - ANSWER_ROUTED to Foon
+[2026-05-17 07:08:30] Tribbes 2 - ICE_ROUTED to Foon (type=host)
+[2026-05-17 07:08:30] Tribbes 2 - ICE_ROUTED to Foon (type=srflx)
+[2026-05-17 07:08:30] hentus - ANSWER_ROUTED to Foon
+[2026-05-17 07:08:30] hentus - ICE_ROUTED to Foon (type=host)
+[2026-05-17 07:08:30] hentus - ICE_ROUTED to Foon (type=host)
+[2026-05-17 07:08:30] hentus - ICE_ROUTED to Foon (type=srflx)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to Tribbes 2 (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Foon - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:08:30] Tribbes 2 - ICE_ROUTED to Foon (type=host)
+[2026-05-17 07:08:50] Tribbes 2 - DISCONNECT Intentional close. Room now has: hentus, Foon
+[2026-05-17 07:08:50] Tribbes 2 - BROADCAST_LEAVE Notified hentus
+[2026-05-17 07:08:50] Tribbes 2 - BROADCAST_LEAVE Notified unknown
+[2026-05-17 07:08:50] Tribbes 2 - BROADCAST_LEAVE Notified Foon
+[2026-05-17 07:09:22] Foon - DISCONNECT Intentional close. Room now has: hentus
+[2026-05-17 07:09:22] Foon - BROADCAST_LEAVE Notified hentus
+[2026-05-17 07:09:22] Foon - BROADCAST_LEAVE Notified unknown
+[2026-05-17 07:09:22] SYSTEM - WS_CLOSE Unjoined connection closed
+[2026-05-17 07:09:37] SYSTEM - WS_CONNECT New connection. Total users: 1
+[2026-05-17 07:09:37] Tribbes - JOIN_SUCCESS Room now has: hentus, Tribbes
+[2026-05-17 07:09:37] Tribbes - BROADCAST_JOIN Notified hentus
+[2026-05-17 07:09:43] Tribbes - OFFER_ROUTED to hentus
+[2026-05-17 07:09:43] Tribbes - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:09:43] Tribbes - ICE_ROUTED to hentus (type=srflx)
+[2026-05-17 07:09:43] Tribbes - ICE_ROUTED to hentus (type=host)
+[2026-05-17 07:09:43] hentus - ANSWER_ROUTED to Tribbes
+[2026-05-17 07:09:43] hentus - ICE_ROUTED to Tribbes (type=host)
+[2026-05-17 07:09:43] hentus - ICE_ROUTED to Tribbes (type=host)
+[2026-05-17 07:09:43] hentus - ICE_ROUTED to Tribbes (type=srflx)
+[2026-05-17 07:09:43] hentus - ICE_ROUTED to Tribbes (type=host)
+[2026-05-17 07:09:43] hentus - ICE_ROUTED to Tribbes (type=host)
+[2026-05-17 07:10:10] Tribbes - DISCONNECT Intentional close. Room now has: hentus
+[2026-05-17 07:10:10] Tribbes - BROADCAST_LEAVE Notified hentus
