@@ -1,38 +1,38 @@
-# Media files (2TB external drive mount)
+# ===== WEAVE PROJECT REPOSITORY =====
+# This repository should ONLY contain weave-voice and weave project files
+# Exclude all other docker services and server infrastructure
+
+# === EXCLUDE ALL DOCKER SERVICES EXCEPT WEAVE-VOICE ===
+docker/n8n/
+docker/plex/
+docker/portainer/
+docker/teamspeak_backup/
+docker/teamspeak6/
+docker/pawpicked/
+docker/polydot/
+docker/linkstack/
+docker/root-apps/
+
+# === MEDIA AND DATA ===
 media/
 
-# Environment files (secrets)
+# === ENVIRONMENT AND SECRETS ===
 .env
 *.env
 .env.*
 
-# Docker volumes and runtime data
+# === DOCKER VOLUMES AND RUNTIME DATA ===
 volumes/
 data/
 **/volumes/
 **/data/
 
-# Portainer runtime directories and database (permission denied)
-docker/portainer/docker_config/
-docker/portainer/bin/
-docker/portainer/compose/
-docker/portainer/chisel/
-docker/portainer/certs/
-docker/portainer/tls/
-docker/portainer/portainer.db
-docker/portainer/portainer.db-*
-docker/portainer/portainer.key
-docker/portainer/portainer.pub
-
-# TeamSpeak backup files (permission denied)
-docker/teamspeak_backup/files/
-
-# Log files
+# === LOG FILES ===
 *.log
 logs/
 **/logs/
 
-# Editor configurations
+# === EDITOR AND IDE ===
 .DS_Store
 .vscode/
 .idea/
@@ -40,7 +40,7 @@ logs/
 *.swo
 *~
 
-# Temporary and cache files
+# === TEMPORARY AND CACHE FILES ===
 tmp/
 temp/
 *.tmp
@@ -48,6 +48,18 @@ temp/
 .cache/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+
+# === NODE ===
+node_modules/
+package-lock.json
+yarn.lock
+
+# === OS FILES ===
+Thumbs.db
+.DS_Store
 *.pyo
 
 # Database runtime files
