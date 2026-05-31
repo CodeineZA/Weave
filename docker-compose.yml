@@ -76,6 +76,63 @@ services:
     volumes:
       - /home/codeine/server/docker/teamspeak6:/var/ts3server/
 
+# --- Voice Chat App (weave-voice) ---
+  # --- Voice Chat Signaling Server ---
+  # Runs on default Docker bridge network (server_default)
+  # Exposed on Pi's network IP so Cloudflare tunnel can reach it
+  # Cloudflare route: "weave.codeine.cloud": "http://192.168.0.21:3000"
+  weave-voice:
+    build:
+      context: /home/codeine/server/docker/weave-voice
+      dockerfile: Dockerfile
+    container_name: weave-voice
+    restart: unless-stopped
+    ports:
+      - "3000:3000"  # Exposed on all interfaces for Cloudflare tunnel access
+    environment:
+      - SERVER_PASSWORD=friends123  # Change this to a strong password!
+      - PORT=3000
+      # TURN server configuration (optional, for NAT traversal)
+      # Coturn container on same Docker network, accessible via container DNS
+      - TURN_URL=turn:weave-coturn:3478
+      - TURN_USERNAME=webrtc
+      - TURN_CREDENTIAL=${TURN_SECRET:-shared-secret-change-me}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # --- TURN/STUN Relay Server (NAT Traversal) ---
+  # Runs on default Docker bridge network (server_default)
+  # Handles media relay when direct P2P fails (behind firewalls/NAT)
+  # Accessed internally by weave-voice container via DNS: weave-coturn:3478
+  weave-coturn:
+    image: coturn/coturn:latest
+    container_name: weave-coturn
+    restart: unless-stopped
+    ports:
+      - "3478:3478/tcp"        # TURN/STUN (TCP - works through firewalls)
+      - "3478:3478/udp"        # TURN/STUN (UDP - faster if allowed)
+      - "5349:5349/tcp"        # TURNS (TLS, if needed)
+      - "5349:5349/udp"        # TURNS (TLS, if needed)
+    volumes:
+      - /home/codeine/server/docker/weave-voice/coturn.conf:/etc/coturn/turnserver.conf:ro
+    environment:
+      # TURN secret for authentication
+      - TURN_SECRET=${TURN_SECRET:-shared-secret-change-me}
+    healthcheck:
+      test: ["CMD", "coturn-client-cli", "-u", "webrtc", "-w", "${TURN_SECRET:-shared-secret-change-me}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 # --- Cloudflare Secure Tunnel ---
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -84,15 +141,27 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=eyJhIjoiNGZkYmUwY2ZmYzI1OGZmZDFiOGE2YTFmZDc2NmE4ZGUiLCJ0IjoiOTZjNjg3YjQtNzUxMy00NjczLTlmYTktNDg2MTRkNzdhNTczIiwicyI6IllXTXdOemxqTXpVdFpUTTJNUzAwTnpZNExXRXlPVGt0TnpVeVlUVXdOV1ptTjJZeCJ9
-# --- ROOT Voice Chat Apps ---
-  spinning-wheel:
-    build: /home/codeine/server/docker/root-apps/spinning-wheel
-    container_name: spinning-wheel
+
+  # --- Dedicated Cloudflare Tunnel for weave-voice ---
+  weave-cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: weave-cloudflared
     restart: unless-stopped
-    ports:
-      - "5000:5000"
+    command: tunnel --no-autoupdate --loglevel debug run
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiNGZkYmUwY2ZmYzI1OGZmZDFiOGE2YTFmZDc2NmE4ZGUiLCJ0IjoiNzA3NmQzMGQtOWZjNy00ZmQwLWJiNTMtMmU2NWIzMGZjOGY2IiwicyI6IlpXSmhOMkU1TVdFdFl6TmhaaTAwTlRVM0xUa3haV1V0TkdNeE1EUTRZbUU1T1RSaSJ9
+    depends_on:
+      - weave-voice
+    networks:
+      - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    dns:
+      - 127.0.0.11
+      - 8.8.8.8
       
 # --- VOLUMES DEFINITION (Crucial) ---
 volumes:
   linkstack_data:
+
 
