@@ -1,86 +1,7 @@
 services:
-  # --- Brand & Socials ---
-  linkstack:
-    image: linkstackorg/linkstack
-    container_name: linkstack
-    restart: unless-stopped
-    ports:
-      - "8080:80"  # Opened for direct testing
-    volumes:
-      - linkstack_data:/htdocs  # <--- Now using a managed Volume!
-  
-  # --- WEBSITES (Lovable App) ---
-  # --- Pawpicked by Sneeu (Lovable App) ---
-  pawpicked:
-    build: /home/codeine/server/pawpicked
-    container_name: pawpicked
-    restart: unless-stopped
-    ports:
-      - "8081:80"
-    volumes:
-      - /home/codeine/server/docker/pawpicked/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-  polydot:
-      build: /home/codeine/server/polydot  # Points to the new cloned repo
-      container_name: polydot
-      restart: unless-stopped
-      ports:
-        - "8082:80" # Maps local port 8082 to the container's web server
-        
-  # --- Management & Tools ---
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /home/codeine/server/docker/portainer:/data
-    ports:
-      - 9000:9000
-
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    container_name: n8n
-    restart: unless-stopped
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_SECURE_COOKIE=false
-      - N8N_EDITOR_BASE_URL=https://n8n.codeine.cloud
-      - WEBHOOK_URL=https://n8n.codeine.cloud
-    volumes:
-      - /home/codeine/server/docker/n8n:/home/node/.n8n
-
-  # --- Media & Voice ---
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    network_mode: host
-    environment:
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /home/codeine/server/docker/plex/config:/config
-      - /home/codeine/server/media:/media
-    restart: unless-stopped
-
-  teamspeak:
-    image: indogermane/teamspeak6-server-arm:latest
-    container_name: teamspeak-server
-    restart: unless-stopped
-    ports:
-      - "9987:9987/udp"
-      - "30033:30033/tcp"
-      - "10011:10011/tcp"
-    environment:
-      - TSSERVER_LICENSE_ACCEPTED=accept  # <-- This is the corrected line
-    volumes:
-      - /home/codeine/server/docker/teamspeak6:/var/ts3server/
-
-# --- Voice Chat App (weave-voice) ---
-  # --- Voice Chat Signaling Server ---
-  # Runs on default Docker bridge network (server_default)
-  # Exposed on Pi's network IP so Cloudflare tunnel can reach it
-  # Cloudflare route: "weave.codeine.cloud": "http://192.168.0.21:3000"
+  # --- Weave Voice Chat Application ---
+  # Voice chat signaling server built with Node.js + WebRTC
+  # Runs on Docker bridge network and exposes port 3000 for Cloudflare tunnel
   weave-voice:
     build:
       context: /home/codeine/server/docker/weave-voice
@@ -88,12 +9,10 @@ services:
     container_name: weave-voice
     restart: unless-stopped
     ports:
-      - "3000:3000"  # Exposed on all interfaces for Cloudflare tunnel access
+      - "3000:3000"  # Exposed on all interfaces for tunnel access
     environment:
-      - SERVER_PASSWORD=friends123  # Change this to a strong password!
+      - SERVER_PASSWORD=friends123  # Change to strong password
       - PORT=3000
-      # TURN server configuration (optional, for NAT traversal)
-      # Coturn container on same Docker network, accessible via container DNS
       - TURN_URL=turn:weave-coturn:3478
       - TURN_USERNAME=webrtc
       - TURN_CREDENTIAL=${TURN_SECRET:-shared-secret-change-me}
@@ -103,24 +22,24 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    depends_on:
+      - weave-coturn
 
-  # --- TURN/STUN Relay Server (NAT Traversal) ---
-  # Runs on default Docker bridge network (server_default)
+  # --- TURN/STUN Server for NAT Traversal ---
   # Handles media relay when direct P2P fails (behind firewalls/NAT)
-  # Accessed internally by weave-voice container via DNS: weave-coturn:3478
+  # Accessed internally by weave-voice via Docker DNS: weave-coturn:3478
   weave-coturn:
     image: coturn/coturn:latest
     container_name: weave-coturn
     restart: unless-stopped
     ports:
-      - "3478:3478/tcp"        # TURN/STUN (TCP - works through firewalls)
-      - "3478:3478/udp"        # TURN/STUN (UDP - faster if allowed)
-      - "5349:5349/tcp"        # TURNS (TLS, if needed)
-      - "5349:5349/udp"        # TURNS (TLS, if needed)
+      - "3478:3478/tcp"        # TURN/STUN (TCP)
+      - "3478:3478/udp"        # TURN/STUN (UDP)
+      - "5349:5349/tcp"        # TURNS (TLS/TCP)
+      - "5349:5349/udp"        # TURNS (TLS/UDP)
     volumes:
       - /home/codeine/server/docker/weave-voice/coturn.conf:/etc/coturn/turnserver.conf:ro
     environment:
-      # TURN secret for authentication
       - TURN_SECRET=${TURN_SECRET:-shared-secret-change-me}
     healthcheck:
       test: ["CMD", "coturn-client-cli", "-u", "webrtc", "-w", "${TURN_SECRET:-shared-secret-change-me}"]
@@ -133,16 +52,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-# --- Cloudflare Secure Tunnel ---
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflare-tunnel
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=eyJhIjoiNGZkYmUwY2ZmYzI1OGZmZDFiOGE2YTFmZDc2NmE4ZGUiLCJ0IjoiOTZjNjg3YjQtNzUxMy00NjczLTlmYTktNDg2MTRkNzdhNTczIiwicyI6IllXTXdOemxqTXpVdFpUTTJNUzAwTnpZNExXRXlPVGt0TnpVeVlUVXdOV1ptTjJZeCJ9
 
   # --- Dedicated Cloudflare Tunnel for weave-voice ---
+  # Securely exposes weave.codeine.cloud to the internet
+  # Routes traffic to weave-voice:3000 via Cloudflare Zero Trust
   weave-cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: weave-cloudflared
@@ -159,9 +72,8 @@ services:
     dns:
       - 127.0.0.11
       - 8.8.8.8
-      
-# --- VOLUMES DEFINITION (Crucial) ---
-volumes:
-  linkstack_data:
 
-
+networks:
+  default:
+    name: weave_default
+    driver: bridge
