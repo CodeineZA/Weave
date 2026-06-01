@@ -1,0 +1,23 @@
+{
+  "name": "voice-chat-room",
+  "version": "1.0.0",
+  "description": "Lightweight self-hosted voice and screen sharing web app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "voice",
+    "chat",
+    "webrtc",
+    "screen-sharing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "dotenv": "^16.3.1"
+  }
+}

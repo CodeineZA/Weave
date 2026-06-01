@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Chat Room</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Join Screen -->
+  <div id="joinScreen" class="screen screen-active">
+    <div class="join-container">
+      <div class="join-header">
+        <h1>🎤 Voice Chat</h1>
+        <p>Join a room with your friends</p>
+      </div>
+      <form id="joinForm" class="join-form">
+        <div class="form-group">
+          <input
+            type="text"
+            id="usernameInput"
+            placeholder="Your name"
+            required
+            maxlength="32"
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="passwordInput"
+            placeholder="Room password"
+            required
+          />
+        </div>
+        <button type="submit" class="btn-primary">Join Room</button>
+        <div id="joinError" class="error-message" style="display: none;"></div>
+      </form>
+    </div>
+  </body>
+
+  <!-- Room Screen -->
+  <div id="roomScreen" class="screen">
+    <div class="room-container">
+      <!-- Main content area -->
+      <div class="main-content">
+        <div id="screensContainer" class="screens-container">
+          <!-- Screen shares displayed here -->
+        </div>
+        <div id="noScreenMessage" class="no-screen-message">
+          <p>No one is sharing their screen</p>
+        </div>
+      </div>
+
+      <!-- Users sidebar -->
+      <div class="users-sidebar">
+        <div class="users-header">
+          <h3>In Room</h3>
+          <span id="userCount" class="user-count">0</span>
+        </div>
+        <div id="usersList" class="users-list">
+          <!-- User list populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Control bar -->
+    <div class="control-bar">
+      <div class="controls-group">
+        <button id="muteBtn" class="control-btn" title="Toggle microphone">
+          <span class="icon">🎤</span>
+          <span class="label">Mute</span>
+        </button>
+        <button id="screenShareBtn" class="control-btn" title="Toggle screen share">
+          <span class="icon">🖥️</span>
+          <span class="label">Share Screen</span>
+        </button>
+      </div>
+      <div class="controls-group">
+        <button id="leaveBtn" class="control-btn control-btn-danger" title="Leave room">
+          <span class="icon">📞</span>
+          <span class="label">Leave</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Audio elements for receiving streams -->
+    <div id="audioContainer" style="display: none;">
+      <!-- Audio elements created dynamically -->
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

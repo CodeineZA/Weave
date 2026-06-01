@@ -1,0 +1,328 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    VOICE CHAT ROOM - SYSTEM ARCHITECTURE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              NETWORK FLOW DIAGRAM                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                        ┌──────────────────────┐
+                        │  Signaling Server    │
+                        │   (Node.js + WS)     │
+                        │   on port 3000       │
+                        └──────────────────────┘
+                                │
+                                │ WebSocket
+                                │ (Signaling only)
+                                │
+                ┌───────────────┼───────────────┐
+                │               │               │
+           ┌────▼────┐     ┌────▼────┐     ┌────▼────┐
+           │ Client A │     │ Client B │     │ Client C │
+           │ (Browser)│     │(Browser) │     │(Browser) │
+           └────┬────┘     └────┬────┘     └────┬────┘
+                │               │               │
+                ├───────────────┼───────────────┤
+                │               │               │
+            WebRTC P2P Audio (Direct)
+         (Encrypted with DTLS-SRTP)
+                │               │               │
+                ├───────────────┼───────────────┤
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SIGNALING MESSAGE FLOW                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+User A Joins:
+    A → Server: { type: "join", userId, username, password }
+    Server broadcasts to all:
+    B ← Server: { type: "user_joined", userId, username }
+    C ← Server: { type: "user_joined", userId, username }
+
+Peer Connection Setup (A ↔ B):
+    A → Server: { type: "offer", to: B, data: sdp }
+    B ← Server: { type: "offer", from: A, data: sdp }
+    B → Server: { type: "answer", to: A, data: sdp }
+    A ← Server: { type: "answer", from: B, data: sdp }
+
+ICE Candidate Exchange:
+    A → Server: { type: "ice_candidate", to: B, data: candidate }
+    B ← Server: { type: "ice_candidate", from: A, data: candidate }
+    (Repeat for multiple candidates)
+
+Screen Sharing Notification:
+    A → Server: { type: "screen_share_start" }
+    B,C ← Server: { type: "screen_share_started", userId: A }
+    (WebRTC video track established separately)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           FILE ARCHITECTURE                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+PROJECT ROOT
+│
+├── server.js ──────────────► WebSocket Signaling Server
+│                             • Express for static files
+│                             • WebSocket for signaling
+│                             • In-memory room state
+│                             • Message routing
+│
+├── package.json ───────────► Dependencies
+│                             • express
+│                             • ws (WebSocket)
+│                             • dotenv
+│
+├── .env ────────────────────► Configuration
+│                             • SERVER_PASSWORD
+│                             • PORT
+│                             • TURN credentials (optional)
+│
+└── public/
+    │
+    ├── index.html ─────────► Single Page App Shell
+    │                         • Join form
+    │                         • Room UI
+    │                         • User list
+    │                         • Controls
+    │
+    ├── app.js ─────────────► Complete Client Logic (1000+ lines)
+    │                         • WebRTC peer connections
+    │                         • WebSocket signaling
+    │                         • Voice activity detection
+    │                         • Screen sharing
+    │                         • UI updates
+    │
+    └── style.css ──────────► Dark Theme Styling
+                              • CSS variables
+                              • Responsive design
+                              • Discord-like aesthetic
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         REQUEST/RESPONSE CYCLE                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Browser Load:
+    Browser → http://localhost:3000
+    Server ←→ Serves index.html + style.css + app.js
+    Browser executes app.js (client-side)
+
+User Joins:
+    User enters: name + password
+    app.js → WebSocket connect
+    app.js → getUserMedia() [request microphone]
+    Browser/OS → asks user for microphone permission
+    User → allows
+    app.js gets MediaStream
+    app.js → WebSocket send join message
+    Server processes:
+        • Validates password
+        • Stores user in room map
+        • Sends join_ack with user list
+        • Broadcasts user_joined to others
+
+Peer Creates Connection:
+    app.js → new RTCPeerConnection()
+    app.js → addTrack(audioTrack)
+    app.js → createOffer()
+    app.js → WebSocket send offer
+    
+    Remote Peer receives offer:
+    app.js ← WebSocket offer message
+    app.js → setRemoteDescription(offer)
+    app.js → createAnswer()
+    app.js → WebSocket send answer
+    
+    First Peer receives answer:
+    app.js ← WebSocket answer message
+    app.js → setRemoteDescription(answer)
+
+Audio Flows (Peer-to-Peer):
+    Local Peer → WebRTC (encrypted) → Remote Peer
+    (Server never sees/touches the audio)
+
+Screen Share:
+    User clicks "Share Screen"
+    Browser → getDisplayMedia() picker
+    User selects window/screen
+    app.js gets video stream
+    app.js → replaceTrack() on all peer connections
+    app.js → WebSocket broadcast screen_share_started
+    Video stream flows P2P to all peers
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DATA FLOW (NOT THROUGH SERVER)                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Signaling Data (Lightweight - Through Server):
+    [join, offer, answer, ice_candidate, screen_share_*]
+    Size: ~100 bytes - 5 KB per message
+    Frequency: Once per setup, then periodic ICE candidates
+    Rate: ~1-2 messages per second during connection
+    
+    ✓ Server can log this (optional)
+    ✓ Server can audit this
+
+Media Data (Bandwidth - P2P, NOT through server):
+    [audio stream, video stream]
+    Size: ~60 kbps (audio), ~500 kbps - 2 Mbps (video)
+    
+    ✗ Server NEVER sees this
+    ✗ Server CANNOT access this
+    ✗ Server CANNOT record this
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       DEPLOYMENT TOPOLOGY OPTIONS                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+OPTION 1: Local Network (Same Wi-Fi)
+    ┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+    │  User A     │      │  Pi Running  │      │  User B     │
+    │  Laptop     │──WS──│  Server      │──WS──│  Phone      │
+    │ 192.168.1.5 │      │ 192.168.1.10 │      │ 192.168.1.X │
+    └─────────────┘      └──────────────┘      └─────────────┘
+           │                     │                      │
+           └─────────P2P Audio───┴──────────────────────┘
+
+OPTION 2: Cloudflare Tunnel (Public Internet)
+    ┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+    │  User A     │      │ Cloudflare   │      │  User B     │
+    │  Anywhere   │─HTTPS│  Tunnel      │─HTTPS│  Anywhere   │
+    │ Internet    │      │ → localhost  │      │ Internet    │
+    └─────────────┘      └──────────────┘      └─────────────┘
+           │                     │                      │
+           └─────────P2P Audio───┴──────────────────────┘
+               (via STUN/TURN)
+
+OPTION 3: VPS + TURN Server (Advanced)
+    ┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+    │  User A     │      │  VPS         │      │  User B     │
+    │  Behind NAT │─HTTPS│  Server      │─HTTPS│  Behind NAT │
+    │ Corporate   │      │  + TURN      │      │ Corporate   │
+    └─────────────┘      └──────────────┘      └─────────────┘
+           │                     │                      │
+           └───────via TURN relay─┼──────────────────────┘
+             (Only if P2P fails)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          STATE MANAGEMENT                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Server State:
+    room = {
+        users: {
+            userId1: { id, username, ws },
+            userId2: { id, username, ws },
+            ...
+        }
+    }
+    
+Client State (app.js):
+    state = {
+        userId: "abc123",
+        username: "Alice",
+        ws: WebSocket,
+        localStream: MediaStream,
+        screenStream: MediaStream,
+        peers: {
+            userId2: {
+                pc: RTCPeerConnection,
+                audioStream: MediaStream,
+                screenStream: MediaStream
+            },
+            userId3: { ... }
+        },
+        users: {
+            userId2: { username, isSpeaking, isScreenSharing },
+            userId3: { ... }
+        },
+        isMuted: false,
+        isScreenSharing: false
+    }
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      PERFORMANCE CHARACTERISTICS                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Bandwidth per User:
+    Audio: 40-60 kbps (duplex)
+    Screen Share: 500 kbps - 2 Mbps (depends on motion/res)
+    Signaling: ~1 kbps (negligible)
+
+CPU Usage:
+    Server: <5% (just routing messages)
+    Client Audio: 5-10% per peer
+    Client Screen: 15-25%
+
+Memory:
+    Server: ~100 MB base, +10 MB per user
+    Client: ~200 MB for app + streams
+
+Latency:
+    P2P Audio: 20-100ms (direct)
+    P2P via TURN: 100-300ms (relay)
+
+Network Topology Impact:
+    Same LAN: 10-30ms P2P latency
+    Across internet (direct): 50-150ms
+    Across NAT (via TURN): 100-300ms
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       SECURITY ARCHITECTURE                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Layer 1: WebSocket Signaling
+    • Password protected (checked on join)
+    • One password for all users (shared secret)
+    • No encryption on signaling (but could use WSS/TLS)
+
+Layer 2: WebRTC Media
+    • DTLS-SRTP automatic encryption
+    • Each connection uses random keys
+    • Perfect forward secrecy
+    • Server never has access to keys
+
+Layer 3: NAT Traversal
+    • STUN: Simple hole punching (no relay)
+    • TURN: Last resort, encrypts if using TURNS
+
+Result:
+    ✓ Audio is encrypted end-to-end
+    ✓ Server cannot eavesdrop
+    ✓ No user data in database
+    ✓ Password-only auth (not ideal, but works for small groups)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                            KEY DESIGN DECISIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Peer-to-Peer Audio (not server relay)
+   → Saves bandwidth, lower latency, server scales horizontally
+
+2. Vanilla JavaScript (no frameworks)
+   → Minimal dependencies, faster load time, full control
+
+3. Single Room (not multiple rooms)
+   → Simpler code, suitable for small trusted groups
+
+4. WebSocket Signaling (not HTTP polling)
+   → Bidirectional, real-time, low overhead
+
+5. STUN-only by default (TURN optional)
+   → Works for most home/office networks, optional TURN for corporate
+
+6. No Persistence (everything in memory)
+   → Simpler deployment, no database, suitable for ephemeral rooms
+
+7. No Accounts (username + password)
+   → Lower friction, suitable for trusted friends
+
+═══════════════════════════════════════════════════════════════════════════════

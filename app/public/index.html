@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Room • Voice & Screen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="join-screen" class="screen">
+        <div class="join-card">
+            <h1>Voice Room</h1>
+            <p class="subtitle">A minimal voice + screen chat for friends</p>
+
+            <div class="form-group">
+                <label for="username">Your name</label>
+                <input type="text" id="username" placeholder="e.g. Alex" maxlength="20" autocomplete="off" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Room password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button id="join-btn" class="btn-primary">Join Room</button>
+            <div id="join-error" class="error"></div>
+        </div>
+    </div>
+
+    <div id="room-screen" class="screen hidden">
+        <div class="room-layout">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h2>In the room</h2>
+                    <span id="user-count" class="count">0</span>
+                </div>
+                <div id="users-list" class="users-list"></div>
+            </div>
+
+            <div class="main-area">
+                <div id="screen-grid" class="screen-grid"></div>
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-icon">📺</div>
+                    <h3>No screen shared yet</h3>
+                    <p>Anyone can start sharing their screen</p>
+                </div>
+            </div>
+
+            <div class="controls-bar">
+                <div class="controls-left">
+                    <button id="mute-btn" class="control-btn" title="Mute / Unmute">
+                        <span id="mute-icon">🎤</span>
+                        <span id="mute-text">Mute</span>
+                    </button>
+                    <button id="screen-btn" class="control-btn" title="Share screen">
+                        <span id="screen-icon">📺</span>
+                        <span id="screen-text">Share screen</span>
+                    </button>
+                </div>
+                <div class="controls-center">
+                    <div id="my-username-display" class="my-name"></div>
+                </div>
+                <div class="controls-right">
+                    <button id="leave-btn" class="control-btn leave-btn" title="Leave room">Leave</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hidden-audio" style="display: none;"></div>
+    <script src="app.js"></script>
+</body>
+</html>

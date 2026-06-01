@@ -1,0 +1,14 @@
+{
+  "name": "voice-room",
+  "version": "1.0.0",
+  "description": "Lightweight self-hosted voice + screen sharing web app",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ws": "^8.18.0"
+  }
+}

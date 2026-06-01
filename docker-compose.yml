@@ -4,7 +4,7 @@ services:
   # Runs on Docker bridge network and exposes port 3000 for Cloudflare tunnel
   weave-voice:
     build:
-      context: /home/codeine/server/docker/weave-voice
+      context: /home/codeine/Weave_proj/docker/weave-voice
       dockerfile: Dockerfile
     container_name: weave-voice
     restart: unless-stopped
@@ -38,7 +38,7 @@ services:
       - "5349:5349/tcp"        # TURNS (TLS/TCP)
       - "5349:5349/udp"        # TURNS (TLS/UDP)
     volumes:
-      - /home/codeine/server/docker/weave-voice/coturn.conf:/etc/coturn/turnserver.conf:ro
+      - /home/codeine/Weave_proj/docker/weave-voice/coturn.conf:/etc/coturn/turnserver.conf:ro
     environment:
       - TURN_SECRET=${TURN_SECRET:-shared-secret-change-me}
     healthcheck:
