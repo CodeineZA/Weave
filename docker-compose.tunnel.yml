@@ -1,0 +1,15 @@
+services:
+  weave-cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: weave-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --loglevel debug run
+    environment:
+      - TUNNEL_TOKEN=${WEAVE_TUNNEL_TOKEN}
+    depends_on:
+      - weave-voice
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    dns:
+      - 127.0.0.11
+      - 8.8.8.8
