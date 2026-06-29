@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Weave — Voice for small crews</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Cinzel+Decorative:wght@400;700;900&amp;family=IM+Fell+English:ital@0;1&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=46">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M2 8c3.5 0 3.5 8 7 8s3.5-8 7-8 3.5 8 7 8' stroke='%23E8A83A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+  <!-- Join Screen -->
+  <div id="joinScreen" class="screen screen-active">
+    <div class="join-bg-glow"></div>
+    <canvas id="joinCanvas" class="join-canvas"></canvas>
+    <div class="join-vignette"></div>
+    <div class="join-container">
+      <div class="join-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7c3 0 3 10 6 10s3-10 6-10 3 10 6 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-name">Weave</span>
+        </div>
+        <h1 id="authTitle">Welcome back</h1>
+        <p id="authSubtitle">Voice for small crews. Hop in.</p>
+      </div>
+      <!-- ── LOGIN PANEL ─────────────────────────────────── -->
+      <div id="loginPanel" class="auth-panel">
+        <form id="loginForm" class="join-form" novalidate="">
+          <div class="form-group">
+            <label for="loginFullName">
+              Full Name
+              <span class="tip-icon" data-tip="The name you registered with. Kept private — only used to log you in.">ⓘ</span>
+            </label>
+            <input type="text" id="loginFullName" placeholder="e.g. Alex Mercer" autocomplete="name" maxlength="64"/>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"/>
+          </div>
+          <label class="login-opt">
+            <input type="checkbox" id="autoJoinLobby" checked/>
+            <span>Drop me straight into the Lobby <span class="login-opt-hint">(uncheck to pick a channel yourself)</span></span>
+          </label>
+          <button type="submit" id="loginBtn" class="btn-primary">
+            <span>Login</span>
+            <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div id="loginError" class="error-message" style="display: none;"></div>
+        </form>
+        <div class="auth-links">
+          <a href="#" id="toRegisterLink" class="auth-link">Register</a>
+          <span class="auth-link-sep">·</span>
+          <a href="#" id="toForgotLink" class="auth-link">Forgot Password</a>
+        </div>
+      </div>
+
+      <!-- ── REGISTER PANEL ─────────────────────────────── -->
+      <div id="registerPanel" class="auth-panel" style="display:none;">
+        <form id="registerForm" class="join-form" novalidate="">
+          <!-- Honeypot: invisible to humans; bots that auto-fill every field are rejected server-side. -->
+          <input type="text" id="regWebsite" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+          <div class="form-group">
+            <label for="regInviteCode">
+              Invite Code
+              <span class="tip-icon" data-tip="Weave is invite-only. Ask a current member to generate a one-time code for you from their ‘Invite a Friend’ menu.">ⓘ</span>
+            </label>
+            <input type="text" id="regInviteCode" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" maxlength="40"/>
+          </div>
+          <div class="form-group">
+            <label for="regFullName">
+              Full Name
+              <span class="tip-icon" data-tip="Your real name — kept completely private. Only used when you log in. Never shown to other users.">ⓘ</span>
+            </label>
+            <input type="text" id="regFullName" placeholder="e.g. Alex Mercer" autocomplete="name" maxlength="64"/>
+          </div>
+          <div class="form-group">
+            <label for="regNickName">
+              Display Name
+              <span class="tip-icon" data-tip="The name everyone in the room sees. Pick something cool — you can update it later.">ⓘ</span>
+            </label>
+            <input type="text" id="regNickName" placeholder="e.g. Ghostbyte" autocomplete="nickname" maxlength="32"/>
+          </div>
+          <div class="form-group">
+            <label for="regPassword">
+              Password
+              <span class="tip-icon" data-tip="At least 8 characters. Something you&#39;ll remember but nobody would guess.">ⓘ</span>
+            </label>
+            <input type="password" id="regPassword" placeholder="Min. 8 characters" autocomplete="new-password"/>
+          </div>
+          <div class="form-group">
+            <label>
+              Profile Picture <span class="optional-tag">(optional)</span>
+              <span class="tip-icon" data-tip="Optional — upload any JPG/PNG and it&#39;ll be cropped to a square. Skip it and you get a default icon you can change later. (iPhone HEIC photos aren&#39;t supported.)">ⓘ</span>
+            </label>
+            <div class="avatar-upload-area">
+              <div class="avatar-upload-preview" id="avatarPreview">
+                <span class="avatar-upload-placeholder">?</span>
+              </div>
+              <div class="avatar-upload-controls">
+                <button type="button" id="avatarUploadBtn" class="btn-upload">Upload Picture</button>
+                <span class="avatar-upload-hint">JPG, PNG, GIF · optional · cropped to square</span>
+                <input type="file" id="avatarFileInput" accept="image/*" style="display:none"/>
+              </div>
+            </div>
+            <input type="hidden" id="regAvatar"/>
+          </div>
+          <div class="form-group">
+            <label for="regSecretPhrase">
+              Secret Phrase
+              <span class="tip-icon" data-tip="Used to recover your password if you forget it. Case-sensitive. Make it long and memorable — this is your safety net.">ⓘ</span>
+            </label>
+            <input type="text" id="regSecretPhrase" placeholder="Something only you would know" autocomplete="off"/>
+          </div>
+          <p class="form-mandatory-note">All fields are required.</p>
+          <button type="submit" id="registerBtn" class="btn-primary">Complete</button>
+          <div id="registerError" class="error-message" style="display: none;"></div>
+        </form>
+        <div class="auth-links">
+          <a href="#" id="toLoginLink1" class="auth-link">← Back to Login</a>
+        </div>
+      </div>
+
+      <!-- ── FORGOT PASSWORD PANEL ──────────────────────── -->
+      <div id="forgotPanel" class="auth-panel" style="display:none;">
+        <div id="forgotVerifyStep">
+          <form id="forgotForm" class="join-form" novalidate="">
+            <div class="form-group">
+              <label for="forgotFullName">Full Name</label>
+              <input type="text" id="forgotFullName" placeholder="The name you registered with" autocomplete="name" maxlength="64"/>
+            </div>
+            <div class="form-group">
+              <label for="forgotSecretPhrase">
+                Secret Phrase
+                <span class="tip-icon" data-tip="Exactly as you set it during registration. Case-sensitive.">ⓘ</span>
+              </label>
+              <input type="text" id="forgotSecretPhrase" placeholder="Your secret phrase" autocomplete="off"/>
+            </div>
+            <button type="submit" id="forgotVerifyBtn" class="btn-primary">
+              <span>Verify</span>
+            </button>
+            <div id="forgotError" class="error-message" style="display: none;"></div>
+          </form>
+        </div>
+        <div id="forgotResetStep" style="display:none;">
+          <form id="resetForm" class="join-form" novalidate="">
+            <div class="form-group">
+              <label for="newPasswordInput">
+                New Password
+                <span class="tip-icon" data-tip="Min. 8 characters. Choose something fresh.">ⓘ</span>
+              </label>
+              <input type="password" id="newPasswordInput" placeholder="Min. 8 characters" autocomplete="new-password"/>
+            </div>
+            <div class="form-group">
+              <label for="newSecretPhraseInput">
+                New Secret Phrase
+                <span class="tip-icon" data-tip="Set a new recovery phrase. Case-sensitive. Make it long and memorable.">ⓘ</span>
+              </label>
+              <input type="text" id="newSecretPhraseInput" placeholder="Something only you would know" autocomplete="off"/>
+            </div>
+            <button type="submit" id="resetBtn" class="btn-primary">Reset Password &amp; Secret</button>
+            <div id="resetError" class="error-message" style="display: none;"></div>
+          </form>
+        </div>
+        <div class="auth-links">
+          <a href="#" id="toLoginLink2" class="auth-link">← Back to Login</a>
+        </div>
+      </div>
+
+      <p class="join-footnote">End-to-end voice • Self-hosted • Your crew, your rules</p>
+    </div>
+
+    <div class="online-panel">
+      <div class="online-panel-header">
+        <span class="online-dot"></span>
+        <span class="online-title">Who's here</span>
+        <span id="onlineCount" class="online-count">0</span>
+      </div>
+      <div id="onlineUsersList" class="online-users-list">
+        <p class="online-empty">No one yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Control Panel -->
+  <div id="adminPanel" class="screen">
+    <div class="admin-topbar">
+      <div class="brand brand-sm">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 7c3 0 3 10 6 10s3-10 6-10 3 10 6 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-name">Weave</span>
+      </div>
+      <span class="admin-badge">Admin Panel</span>
+      <span class="admin-hint">Ctrl+Shift+F+L to return to room</span>
+    </div>
+    <div class="admin-layout">
+      <nav class="admin-nav">
+        <button id="adminNavDb" class="admin-nav-btn active">
+          <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15">
+            <ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M3 5v6c0 1.657 4.029 3 9 3s9-1.343 9-3V5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M3 11v6c0 1.657 4.029 3 9 3s9-1.343 9-3v-6" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          DB
+        </button>
+        <button id="adminNavBirthday" class="admin-nav-btn">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          Birthday
+        </button>
+        <button id="adminNavConfig" class="admin-nav-btn">
+          <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          Configurations
+        </button>
+      </nav>
+      <div class="admin-content" id="adminContent">
+        <div id="adminTableList" class="admin-table-list" style="display:none;"></div>
+        <div id="adminTableView" style="display:none;">
+          <div class="admin-grid-wrap">
+            <table class="admin-grid">
+              <thead id="adminTableHead"></thead>
+              <tbody id="adminTableBody"></tbody>
+            </table>
+          </div>
+          <div class="admin-action-bar">
+            <button id="adminEditBtn" class="control-btn" disabled="">Edit</button>
+            <button id="adminSaveBtn" class="control-btn" style="display:none;">Save</button>
+            <button id="adminCancelBtn" class="control-btn" style="display:none;">Cancel</button>
+            <button id="adminDeleteBtn" class="control-btn control-btn-danger" disabled="">Delete</button>
+            <button id="adminResetPwBtn" class="control-btn" style="display:none;" disabled="">Reset Password</button>
+            <span id="adminActionMsg" class="admin-action-msg"></span>
+          </div>
+        </div>
+
+        <div id="adminBirthdayView" style="display:none;">
+          <div class="admin-config-form">
+            <div class="admin-config-row">
+              <label class="admin-config-label" for="birthdayUserSelect">Birthday User</label>
+              <select id="birthdayUserSelect" class="admin-config-select">
+                <option value="">— none —</option>
+              </select>
+            </div>
+            <div class="admin-config-row admin-config-actions">
+              <button id="adminBirthdaySaveBtn" class="control-btn">Save</button>
+              <button id="adminBirthdayRemoveBtn" class="control-btn">Remove</button>
+              <span id="adminBirthdayMsg" class="admin-action-msg"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminConfigView" style="display:none;">
+          <div class="admin-config-form">
+            <div class="admin-config-row">
+              <label class="admin-config-label" for="configUserSelect">User</label>
+              <select id="configUserSelect" class="admin-config-select">
+                <option value="">— select a user —</option>
+              </select>
+            </div>
+            <div class="admin-config-row">
+              <label class="admin-config-label">Join Event</label>
+              <div id="joinSoundsWrap" class="tag-input-wrap">
+                <div class="tag-input-tags" id="joinSoundsTags"></div>
+                <input type="text" class="tag-input-field" id="joinSoundsField" placeholder="Search sounds…" autocomplete="off">
+                <div class="tag-input-dropdown" id="joinSoundsDropdown"></div>
+              </div>
+            </div>
+            <div class="admin-config-row">
+              <label class="admin-config-label">Leave Event</label>
+              <div id="leaveSoundsWrap" class="tag-input-wrap">
+                <div class="tag-input-tags" id="leaveSoundsTags"></div>
+                <input type="text" class="tag-input-field" id="leaveSoundsField" placeholder="Search sounds…" autocomplete="off">
+                <div class="tag-input-dropdown" id="leaveSoundsDropdown"></div>
+              </div>
+            </div>
+            <div class="admin-config-row admin-config-actions">
+              <button id="adminConfigSaveBtn" class="control-btn" disabled="">Save</button>
+              <span id="adminConfigMsg" class="admin-action-msg"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Room Screen -->
+  <div id="roomScreen" class="screen">
+    <header class="room-topbar">
+      <div class="brand-menu-wrapper">
+        <div class="brand brand-sm">
+          <span class="brand-mark brand-menu-trigger" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7c3 0 3 10 6 10s3-10 6-10 3 10 6 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-name">Weave</span>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="room-container">
+      <!-- Main content area: stream view (hidden by default) + text chat -->
+      <div class="main-content">
+
+        <!-- Stream view: shown when user subscribes to someone's stream -->
+        <div id="streamView" class="stream-view">
+          <video id="streamVideo" autoplay="" playsinline=""></video>
+          <div class="stream-controls">
+            <div class="stream-vol-control">
+              <span class="stream-vol-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M11 5L6 9H3v6h3l5 4V5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+              <input type="range" id="streamVolSlider" class="vol-slider" min="0" max="200" step="5" value="100" title="Stream volume">
+              <span id="streamVolPct" class="vol-pct-label">100%</span>
+            </div>
+            <button id="streamFullscreenBtn" class="stream-ctrl-btn" title="Fullscreen (F)">
+              <svg id="fsIconEnter" width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+              <svg id="fsIconExit" width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+              </svg>
+            </button>
+            <button id="stopStreamBtn" class="stream-ctrl-btn stop-ctrl-btn" title="Close stream">✕</button>
+          </div>
+        </div>
+
+        <!-- Text chat: fills full space by default, shrinks to 30% when streaming -->
+        <div id="textChatPanel" class="text-chat-panel">
+          <!-- Living channel background: one weaving strand per person, behind the messages -->
+          <canvas id="chanBg" class="chan-bg"></canvas>
+          <div class="text-chat-header">
+            <span class="text-chat-icon"><svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+            <span id="textChatChannelName">Lobby</span>
+          </div>
+          <div id="limboBanner" class="limbo-banner" style="display:none;">🔇 You're not in a channel yet — pick one on the right to start talking.</div>
+          <div id="textChatMessages" class="text-chat-messages">
+            <p class="text-chat-placeholder">No messages yet.</p>
+          </div>
+          <div class="text-chat-input-row">
+            <button id="chatAttachBtn" class="text-chat-attach-btn" type="button" title="Attach image">
+              <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <input type="file" id="chatImageInput" accept="image/*" style="display:none"/>
+            <input type="text" id="textChatInput" class="text-chat-input" placeholder="Message…" maxlength="500" autocomplete="off"/>
+            <button id="textChatSend" class="text-chat-send-btn" title="Send">
+              <svg viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                <path d="M12 4l8 8-8 8M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-90 12 12)"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Users sidebar -->
+      <aside class="users-sidebar">
+        <div id="sidebarResizer" class="sidebar-resizer" title="Drag to resize"></div>
+        <div class="users-header">
+          <h3>Channels</h3>
+          <span id="userCount" class="user-count">0</span>
+          <button id="createChannelBtn" class="create-channel-btn" type="button" title="Create a private channel">+</button>
+        </div>
+        <div id="usersList" class="users-list">
+          <!-- User list populated here -->
+        </div>
+      </aside>
+    </div>
+
+    <!-- Grounded User Dock (bottom-right) -->
+    <div class="user-dock" id="userDock">
+      <div class="dock-profile-wrapper">
+        <button class="dock-profile" id="dockProfileBtn" title="Profile menu" type="button" aria-haspopup="menu" aria-expanded="false">
+          <span class="dock-avatar" id="dockAvatar"><span class="dock-avatar-initial">?</span></span>
+          <span class="dock-name" id="dockName">Connecting…</span>
+        </button>
+        <div class="dock-popover dock-popover-profile" id="dockPopover" role="menu" aria-hidden="true">
+
+          <button class="dock-popover-item" data-dock-action="editProfileBtn" role="menuitem" type="button">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M16 4l4 4-11 11H5v-4L16 4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            <span>Edit Profile</span>
+          </button>
+
+          <button class="dock-popover-item" id="micSettingsPanelBtn" role="menuitem" type="button">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span>Mic Settings</span>
+          </button>
+
+          <button class="dock-popover-item" id="displaySettingsBtn" role="menuitem" type="button">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span>Display</span>
+          </button>
+
+          <div class="dock-popover-sep" aria-hidden="true"></div>
+
+          <button class="dock-popover-item" id="fuckDiscordBtn" role="menuitem" type="button">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z" stroke="currentColor" stroke-width="1.7"/></svg>
+            <span>Fuck Discord</span>
+          </button>
+
+          <a class="dock-popover-item" href="https://github.com/users/CodeineZA/projects/2/views/1" target="_blank" rel="noopener noreferrer" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            <span>Make a Suggestion</span>
+          </a>
+
+          <div class="brand-dropdown-invite dock-popover-item dock-popover-invite" id="inviteFriendItem" role="menuitem" tabindex="0">
+            <span class="invite-label">
+              <svg viewBox="0 0 24 24" fill="none" width="16" height="16" style="flex-shrink:0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M19 8v6M22 11h-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              Invite a Friend
+            </span>
+            <div class="invite-expand" id="inviteExpand">
+              <button class="invite-generate-btn" id="generateInviteBtn" type="button">Generate invite code</button>
+              <div class="invite-link-row">
+                <input class="invite-link-input" id="inviteLinkInput" type="text" readonly placeholder="Generate a one-time invite link →"/>
+                <button class="invite-copy-btn" id="copyInviteBtn">Copy</button>
+              </div>
+              <div class="invite-share-row">
+                <button class="share-btn share-discord" id="shareDiscordBtn" title="Share via Discord">Discord</button>
+                <button class="share-btn share-stub" disabled title="WhatsApp — coming soon">WhatsApp</button>
+                <button class="share-btn share-stub" disabled title="Steam — coming soon">Steam</button>
+                <button class="share-btn share-stub" disabled title="Gmail — coming soon">Gmail</button>
+              </div>
+              <span class="invite-discord-no" id="inviteDiscordNo">Eeuw - no</span>
+            </div>
+          </div>
+
+          <div class="dock-popover-sep" aria-hidden="true"></div>
+
+          <button class="dock-popover-item" data-dock-action="saveLogsBtn" role="menuitem" type="button">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M12 3v12M8 11l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span>Submit Bug Report</span>
+          </button>
+
+          <div class="dock-popover-sep" aria-hidden="true"></div>
+
+          <button class="dock-popover-item dock-popover-danger" data-dock-action="leaveBtn" role="menuitem" type="button">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Leave</span>
+          </button>
+
+        </div>
+      </div>
+      <span class="dock-divider" aria-hidden="true"></span>
+      <div class="dock-controls">
+        <button id="muteBtn" class="control-btn dock-btn" title="Toggle microphone" aria-label="Microphone">
+          <span class="icon icon-on" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="icon icon-off" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </button>
+        <button id="screenShareBtn" class="control-btn dock-btn" title="Toggle screen share" aria-label="Share screen">
+          <span class="icon icon-on" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="icon icon-off" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </button>
+        <button id="webcamBtn" class="control-btn dock-btn" title="Toggle webcam" aria-label="Camera">
+          <span class="icon icon-on" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="2" y="6" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M16 10l6-3v10l-6-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="icon icon-off" aria-hidden="true">
+            <svg viewbox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="2" y="6" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M16 10l6-3v10l-6-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden buttons — kept in DOM for app.js wiring; triggered via dock popover delegation -->
+    <button id="saveLogsBtn"   type="button" hidden aria-hidden="true" style="display:none"></button>
+    <button id="leaveBtn"      type="button" hidden aria-hidden="true" style="display:none"></button>
+    <button id="editProfileBtn" type="button" hidden aria-hidden="true" style="display:none"></button>
+
+    <!-- Self-view: own webcam preview while broadcasting (hidden until camera on) -->
+    <div id="selfView" class="self-view">
+      <video id="selfViewVideo" autoplay="" muted="" playsinline=""></video>
+      <button id="flipCamBtn" class="self-view-flip" title="Flip camera">⟲</button>
+    </div>
+
+    <!-- Audio elements injected here by app.js -->
+    <div id="audioContainer" style="display: none;"></div>
+    <!-- Screen-share audio — separate pipeline from mic audio -->
+    <div id="streamAudioContainer" style="display: none;"></div>
+  </div>
+
+  <!-- ── Edit Profile modal ───────────────────────────────────────────── -->
+  <div id="editProfileModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <button id="editProfileClose" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <form id="editProfileForm" class="join-form" novalidate="">
+        <div class="form-group">
+          <label>Profile Picture</label>
+          <div class="avatar-upload-area">
+            <div class="avatar-upload-preview" id="epAvatarPreview"><span class="avatar-upload-placeholder">?</span></div>
+            <div class="avatar-upload-controls">
+              <button type="button" id="epAvatarUploadBtn" class="btn-upload">Change Picture</button>
+              <span class="avatar-upload-hint">JPG, PNG, GIF · cropped to square</span>
+              <input type="file" id="epAvatarFileInput" accept="image/*" style="display:none"/>
+            </div>
+          </div>
+          <input type="hidden" id="epAvatar"/>
+        </div>
+        <div class="form-group">
+          <label for="epNickName">Display Name</label>
+          <input type="text" id="epNickName" maxlength="32" autocomplete="nickname" placeholder="e.g. Ghostbyte"/>
+        </div>
+        <div class="form-group">
+          <label for="epJoinSound">Join Sound</label>
+          <div class="sound-select-row">
+            <select id="epJoinSound" class="profile-select"></select>
+            <button type="button" class="sound-preview-btn" data-for="epJoinSound" title="Preview">🔊</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="epLeaveSound">Leave Sound</label>
+          <div class="sound-select-row">
+            <select id="epLeaveSound" class="profile-select"></select>
+            <button type="button" class="sound-preview-btn" data-for="epLeaveSound" title="Preview">🔊</button>
+          </div>
+        </div>
+        <details class="profile-pw">
+          <summary>Change Password</summary>
+          <div class="form-group">
+            <label for="epCurrentPw">Current Password</label>
+            <input type="password" id="epCurrentPw" autocomplete="current-password"/>
+          </div>
+          <div class="form-group">
+            <label for="epNewPw">New Password</label>
+            <input type="password" id="epNewPw" placeholder="Min. 8 characters" autocomplete="new-password"/>
+          </div>
+          <div class="form-group">
+            <label for="epNewSecret">New Secret Phrase</label>
+            <input type="text" id="epNewSecret" placeholder="Used to recover your account" autocomplete="off"/>
+          </div>
+        </details>
+        <button type="submit" id="epSaveBtn" class="btn-primary">Save Changes</button>
+        <p class="profile-note">Name &amp; picture changes appear the next time you log in.</p>
+        <div id="epError" class="error-message" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Private Channel modal -->
+  <div id="createChannelModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>🔒 New Private Channel</h2>
+        <button id="createChannelClose" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <form id="createChannelForm" class="join-form" novalidate>
+        <div class="form-group">
+          <label for="ccName">Channel Name</label>
+          <input type="text" id="ccName" maxlength="40" placeholder="e.g. Strike Team" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label for="ccUserFilter">Who can see &amp; join</label>
+          <input type="text" id="ccUserFilter" placeholder="Filter people…" autocomplete="off"/>
+          <div id="ccUserList" class="cc-user-list"></div>
+        </div>
+        <button type="submit" id="ccCreateBtn" class="btn-primary">Create &amp; Join</button>
+        <p class="profile-note">Only the people you pick (and admins) can see this channel. It vanishes when everyone leaves.</p>
+        <div id="ccError" class="error-message" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Manage Private Channel (add members) modal -->
+  <div id="manageChannelModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Add to <span id="mcTitle">channel</span></h2>
+        <button id="manageChannelClose" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <form id="manageChannelForm" class="join-form" novalidate>
+        <div class="form-group">
+          <label for="mcUserFilter">Add people</label>
+          <input type="text" id="mcUserFilter" placeholder="Filter people…" autocomplete="off"/>
+          <div id="mcUserList" class="cc-user-list"></div>
+        </div>
+        <button type="submit" id="mcAddBtn" class="btn-primary">Add Members</button>
+        <div id="mcError" class="error-message" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Fullscreen image lightbox — opened by openLightbox() in app.js -->
+  <div id="imgLightbox" class="img-lightbox" hidden>
+    <img id="imgLightboxImg" class="img-lightbox-img" src="" alt="Fullscreen preview"/>
+  </div>
+
+  <!-- mediasoup-client browser bundle (served locally, built by Docker) -->
+  <script src="/mediasoup-client.min.js"></script>
+  <script src="channels.js?v=46"></script>
+  <script src="loom-renderer.js?v=46"></script>
+  <script src="join-background.js?v=46"></script>
+  <script src="voice-levels.js?v=46"></script>
+  <script src="channel-weave.js?v=46"></script>
+  <script src="app.js?v=46"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('stopStreamBtn')?.addEventListener('click', () => {
+        window.weave?.stopWatchingStream?.();
+      });
+      document.getElementById('streamFullscreenBtn')?.addEventListener('click', () => {
+        window.toggleStreamFullscreen?.();
+      });
+      document.getElementById('streamVideo')?.addEventListener('dblclick', () => {
+        window.toggleStreamFullscreen?.();
+      });
+      document.addEventListener('keydown', e => {
+        if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey
+            && document.querySelector('.main-content.has-stream')) {
+          const tag = document.activeElement?.tagName;
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA') { e.preventDefault(); window.toggleStreamFullscreen?.(); }
+        }
+      });
+    });
+  </script>
+
+  <!-- Mic Settings Panel -->
+  <div id="micSettingsPanel" class="modal-overlay" style="display:none;">
+    <div class="modal-card modal-card-narrow">
+      <div class="modal-header">
+        <h2>Mic &amp; Audio</h2>
+        <button id="micSettingsClose" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="mic-panel-section">
+        <div class="mic-panel-label">Input Device</div>
+        <select id="micDeviceSelect" class="mic-device-select"></select>
+        <p class="mic-slider-hint">Pick which microphone Weave listens to.</p>
+      </div>
+      <div class="mic-panel-section">
+        <div class="mic-panel-label">Input Level</div>
+        <div class="mic-meter-track" id="micMeter">
+          <div class="mic-meter-fill" id="micMeterFill"></div>
+          <div class="mic-meter-threshold" id="micMeterThreshold"></div>
+        </div>
+        <p class="mic-slider-hint">Drag the gold line to set where your mic activates — it opens when the green bar passes it.</p>
+        <div class="mic-slider-row">
+          <span class="mic-slider-cap">0%</span>
+          <input type="range" id="micInputGainSlider" min="0" max="200" step="1"/>
+          <span class="mic-slider-cap">200%</span>
+        </div>
+        <p class="mic-slider-hint">Boost a quiet mic or turn down a loud one (100% = unchanged)</p>
+      </div>
+      <div class="mic-panel-section">
+        <div class="mic-panel-label-row">
+          <span>Noise Gate</span>
+          <label class="mic-gate-toggle-label" title="Enable noise gate">
+            <input type="checkbox" id="micGateToggle"/> Enable
+          </label>
+        </div>
+        <p class="mic-slider-hint">When on, your mic only transmits once the level crosses the gold line above.</p>
+      </div>
+      <div class="mic-panel-section">
+        <div class="mic-panel-label">Browser Processing</div>
+        <label class="mic-constraint-row">
+          <input type="checkbox" id="micEchoToggle"/>
+          <span>Echo cancellation</span>
+        </label>
+        <label class="mic-constraint-row">
+          <input type="checkbox" id="micNoiseToggle"/>
+          <span>Noise suppression</span>
+        </label>
+        <label class="mic-constraint-row">
+          <input type="checkbox" id="micAgcToggle"/>
+          <span>Auto gain control <span class="optional-tag">(on by default; turns off automatically when the noise gate is enabled)</span></span>
+        </label>
+        <p class="mic-slider-hint">Off by default — the noise gate above is the main control. Enabling these may conflict with it.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Settings Panel -->
+  <div id="displaySettingsPanel" class="modal-overlay" style="display:none;">
+    <div class="modal-card modal-card-narrow">
+      <div class="modal-header">
+        <h2>Display</h2>
+        <button id="displaySettingsClose" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="mic-panel-section">
+        <label class="mic-constraint-row">
+          <input type="checkbox" id="staticBgToggle"/>
+          <span>Static background <span class="optional-tag">(stops the animated weave behind chat &amp; voices — saves battery/CPU)</span></span>
+        </label>
+        <p class="mic-slider-hint">Turn off the moving strands for a calm, static backdrop. Helpful on low-end or battery-powered devices.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- What's New modal — shows the latest changes once per server restart, per user -->
+  <div id="whatsNewModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card modal-card-narrow">
+      <div class="modal-header">
+        <h2>✨ What's New</h2>
+        <button id="whatsNewClose" class="modal-close" aria-label="Close">×</button>
+      </div>
+      <ul id="whatsNewList" class="whats-new-list"></ul>
+      <button id="whatsNewDismiss" class="btn-primary">Got it</button>
+    </div>
+  </div>
+
+  <!-- User-dock UI glue (no app.js changes; uses existing IDs/clicks) -->
+  <script>
+    (function () {
+      const cog = document.getElementById('dockProfileBtn');
+      const pop = document.getElementById('dockPopover');
+      const dockProfile = document.getElementById('dockProfileBtn');
+      const dockName = document.getElementById('dockName');
+      const dockAvatar = document.getElementById('dockAvatar');
+
+      function closePop() {
+        if (!pop) return;
+        pop.classList.remove('open');
+        pop.setAttribute('aria-hidden', 'true');
+        cog && cog.setAttribute('aria-expanded', 'false');
+      }
+      function togglePop(e) {
+        e && e.stopPropagation();
+        if (!pop) return;
+        const open = pop.classList.toggle('open');
+        pop.setAttribute('aria-hidden', open ? 'false' : 'true');
+        cog && cog.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      cog && cog.addEventListener('click', togglePop);
+      document.addEventListener('click', (e) => {
+        if (!pop || !pop.classList.contains('open')) return;
+        if (e.target.closest('#dockPopover') || e.target.closest('#dockProfileBtn')) return;
+        closePop();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+
+      // Delegate popover items to their original buttons
+      pop && pop.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-dock-action]');
+        if (!item) return;
+        const id = item.getAttribute('data-dock-action');
+        const target = document.getElementById(id);
+        closePop();
+        if (target) target.click();
+      });
+
+      // Mic Settings panel open/close
+      const micPanel      = document.getElementById('micSettingsPanel');
+      const micPanelBtn   = document.getElementById('micSettingsPanelBtn');
+      const micCloseBtn   = document.getElementById('micSettingsClose');
+      function openMicPanel()  { if (micPanel) { micPanel.style.display = 'flex'; closePop(); } }
+      function closeMicPanel() { if (micPanel) micPanel.style.display = 'none'; }
+      micPanelBtn  && micPanelBtn.addEventListener('click',  openMicPanel);
+      micCloseBtn  && micCloseBtn.addEventListener('click',  closeMicPanel);
+      micPanel     && micPanel.addEventListener('click', (e) => { if (e.target === micPanel) closeMicPanel(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && micPanel?.style.display !== 'none') closeMicPanel(); });
+
+      // Display Settings panel open/close
+      const dispPanel    = document.getElementById('displaySettingsPanel');
+      const dispPanelBtn = document.getElementById('displaySettingsBtn');
+      const dispCloseBtn = document.getElementById('displaySettingsClose');
+      function openDispPanel()  { if (dispPanel) { dispPanel.style.display = 'flex'; closePop(); } }
+      function closeDispPanel() { if (dispPanel) dispPanel.style.display = 'none'; }
+      dispPanelBtn && dispPanelBtn.addEventListener('click', openDispPanel);
+      dispCloseBtn && dispCloseBtn.addEventListener('click', closeDispPanel);
+      dispPanel    && dispPanel.addEventListener('click', (e) => { if (e.target === dispPanel) closeDispPanel(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dispPanel?.style.display !== 'none') closeDispPanel(); });
+
+      // Mirror username + avatar into the dock chip
+      function initials(name) {
+        if (!name) return '?';
+        const parts = String(name).trim().split(/\s+/);
+        return ((parts[0] || '')[0] || '?').toUpperCase() + ((parts[1] || '')[0] || '').toUpperCase();
+      }
+      function refreshChip() {
+        const name = window.myUsername || '';
+        if (dockName) dockName.textContent = name || 'Connecting…';
+        if (!dockAvatar) return;
+        // Prefer an existing avatar image from the page
+        const avatarImg =
+          document.querySelector('#avatarPreview img') ||
+          document.querySelector('#epAvatarPreview img');
+        if (avatarImg && avatarImg.src) {
+          dockAvatar.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = avatarImg.src;
+          img.alt = '';
+          dockAvatar.appendChild(img);
+        } else {
+          dockAvatar.innerHTML = '<span class="dock-avatar-initial">' + initials(name) + '</span>';
+        }
+      }
+      refreshChip();
+      setInterval(refreshChip, 1500);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+/* map.css — Styles for the map container, canvas, overlays, book and portal UI */
+
+/* ── Map container ─────────────────────────────────────────────────────── */
+
+#mapContainer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0d0705;
+    z-index: 200;
+}
+
+#mapContainer.map-visible {
+    display: block;
+}
+
+/* ── Canvas wrapper — fills the container absolutely so it always has
+   a definite size regardless of the canvas element inside it.         */
+
+#mapCanvasWrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#mapCanvas {
+    display: block;
+    image-rendering: auto;
+    /* No CSS width/height — JS controls both the buffer and display size */
+}
+
+/* ── Overlay — sits exactly on top of the canvas ─────────────────────────
+   pointer-events: none on the overlay itself; individual children opt in.  */
+
+#mapOverlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ── Close map button ─────────────────────────────────────────────────── */
+
+#mapCloseBtn {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    z-index: 210;
+    background: rgba(20,10,5,0.70);
+    color: #e4c98a;
+    border: 1px solid #6b3a1f;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+}
+
+#mapCloseBtn:hover {
+    background: rgba(59,31,10,0.88);
+}
+
+/* ── Stream portal ────────────────────────────────────────────────────── */
+
+.stream-portal {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    cursor: pointer;
+    border: 2px solid #3b1f0a;
+    background: rgba(20,10,5,0.82);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.stream-portal:hover {
+    border-color: #c8a96e;
+    box-shadow: 0 0 12px rgba(200,169,110,0.4);
+}
+
+.portal-tag {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 13px;
+    color: #e4c98a;
+    padding: 4px 8px;
+    text-align: center;
+    background: rgba(30,15,5,0.7);
+    width: 100%;
+}
+
+.portal-click-hint {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 11px;
+    color: #c8a96e;
+    opacity: 0.7;
+    padding: 3px 0;
+}
+
+.portal-video {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.stream-portal.active .portal-video   { display: block; }
+.stream-portal.active .portal-click-hint { display: none; }
+
+/* ── Book / text-channel overlay ──────────────────────────────────────── */
+
+#bookOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+#bookOverlay.open {
+    pointer-events: all;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.book-wrap {
+    position: relative;
+    width: min(680px, 88vw);
+    height: min(480px, 70vh);
+    background: #f5e6c8;
+    border: 2px solid #3b1f0a;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 12px 40px rgba(10,5,2,0.7);
+    overflow: hidden;
+    /* Simulate open book pages */
+    background-image: linear-gradient(
+        to right,
+        #e8d4a8 0%,
+        #f5e6c8 3%,
+        #f5e6c8 47%,
+        #ecdbb5 50%,
+        #f5e6c8 53%,
+        #f5e6c8 97%,
+        #e8d4a8 100%
+    );
+}
+
+.book-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 8px;
+    border-bottom: 1px solid rgba(59,31,10,0.3);
+    background: rgba(59,31,10,0.06);
+}
+
+.book-title {
+    font-family: 'Cinzel Decorative', 'Palatino Linotype', serif;
+    font-size: 15px;
+    color: #1a0d05;
+    letter-spacing: 0.05em;
+}
+
+.book-channel-id {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 12px;
+    color: #6b3a1f;
+    font-style: italic;
+}
+
+.book-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 14px;
+    color: #1a0d05;
+    line-height: 1.7;
+    scrollbar-width: thin;
+    scrollbar-color: #c8a96e #f5e6c8;
+}
+
+.book-placeholder {
+    opacity: 0.45;
+    font-style: italic;
+    text-align: center;
+    margin-top: 60px;
+}
+
+.book-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(59,31,10,0.25);
+    background: rgba(59,31,10,0.04);
+}
+
+.book-input {
+    flex: 1;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid #c8a96e;
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 14px;
+    color: #1a0d05;
+    outline: none;
+}
+
+.book-input:focus {
+    border-color: #6b3a1f;
+}
+
+.book-send-btn {
+    background: #3b1f0a;
+    color: #e4c98a;
+    border: none;
+    border-radius: 3px;
+    padding: 6px 14px;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.book-send-btn:hover { background: #6b3a1f; }
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #6b3a1f;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    transition: color 0.15s;
+}
+
+.close-btn:hover { color: #1a0d05; }
+
+/* ── Map toggle button in the room UI bar ────────────────────────────── */
+
+#mapToggleBtn {
+    background: rgba(59,31,10,0.15);
+    color: #e4c98a;
+    border: 1px solid #6b3a1f;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 14px;
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+#mapToggleBtn:hover,
+#mapToggleBtn.active {
+    background: rgba(59,31,10,0.5);
+    border-color: #c8a96e;
+}
+
+/* ── Scrollbar style for book overlay ───────────────────────────────── */
+.book-messages::-webkit-scrollbar       { width: 6px; }
+.book-messages::-webkit-scrollbar-track { background: #f5e6c8; }
+.book-messages::-webkit-scrollbar-thumb { background: #c8a96e; border-radius: 3px; }
