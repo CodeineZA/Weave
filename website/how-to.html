@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Self-Host Weave — Setup Guide</title>
+<meta name="description" content="Step-by-step guide to self-hosting Weave: install prerequisites, forward router ports, set up a public hostname, configure Docker, and create your first admin user.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://hello-weave.codeine.cloud/how-to.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Weave">
+<meta property="og:title" content="How to Self-Host Weave — Setup Guide">
+<meta property="og:description" content="Step-by-step guide to self-hosting Weave on your own hardware, including Docker, port forwarding, and Cloudflare Tunnel setup.">
+<meta property="og:url" content="https://hello-weave.codeine.cloud/how-to.html">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How to Self-Host Weave — Setup Guide">
+<meta name="twitter:description" content="Step-by-step guide to self-hosting Weave on your own hardware.">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "How to Self-Host Weave",
+  "description": "Step-by-step guide to self-hosting Weave: prerequisites, router port forwarding, public hostname, Docker Compose, and first admin user creation.",
+  "url": "https://hello-weave.codeine.cloud/how-to.html",
+  "author": { "@type": "Organization", "name": "Weave" }
+}
+</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3 8c3 0 3 8 6 8s3-8 6-8 3 8 6 8" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 15c3 0 3-6 6-6s3 6 6 6 3-6 6-6" stroke="var(--good)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+      </svg>
+      Weave
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html#why">Why Weave</a>
+      <a href="index.html#features">Features</a>
+      <a href="how-to.html">How-To</a>
+      <a href="index.html#contact">Contact</a>
+      <a class="cta" href="https://github.com/CodeineZA/Weave" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap howto-layout">
+  <aside class="howto-toc">
+    <h4>On this page</h4>
+    <ol>
+      <li><a href="#checklist">Quick-start checklist</a></li>
+      <li><a href="#step-1">1. Install prerequisites</a></li>
+      <li><a href="#step-2">2. Forward router ports</a></li>
+      <li><a href="#step-3">3. Public hostname</a></li>
+      <li><a href="#step-4">4. Clone the repo</a></li>
+      <li><a href="#step-5">5. Configure .env</a></li>
+      <li><a href="#step-6">6. Cloudflare Tunnel (optional)</a></li>
+      <li><a href="#step-7">7. Start Weave</a></li>
+      <li><a href="#step-8">8. First admin user</a></li>
+      <li><a href="#updating">Updating Weave</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ol>
+  </aside>
+
+  <article class="howto-content">
+    <h1>Self-host Weave</h1>
+    <p class="lead">Everything you need to run your own instance — on a Raspberry Pi, a spare PC, or any Docker-capable server. Roughly 30–60 minutes end to end.</p>
+
+    <h2 id="checklist">Quick-start checklist</h2>
+    <p>Use this as your progress tracker. Each item maps to a step below.</p>
+    <ul class="checklist">
+      <li>Git installed</li>
+      <li>Docker installed and running</li>
+      <li>Router UDP ports 10000–10100 forwarded to this server's LAN IP</li>
+      <li>Public hostname or IP decided (<code>ANNOUNCED_IP</code>)</li>
+      <li>Repository cloned</li>
+      <li><code>.env</code> file created and filled in</li>
+      <li><code>logs/</code> directory created</li>
+      <li>(Optional) Cloudflare Tunnel token obtained and set</li>
+      <li><code>docker compose up -d</code> ran successfully</li>
+      <li>First admin user created via bootstrap script</li>
+      <li>Logged in and confirmed working</li>
+    </ul>
+
+    <h2 id="step-1">Step 1 — Install prerequisites</h2>
+    <h3>Git</h3>
+    <p><strong>Windows:</strong> Download and run the installer from <a href="https://git-scm.com/downloads" rel="noopener">git-scm.com/downloads</a>. Accept all defaults.</p>
+    <p><strong>Linux / Raspberry Pi:</strong></p>
+    <pre><code>sudo apt update &amp;&amp; sudo apt install -y git</code></pre>
+    <p>Verify: <code>git --version</code></p>
+
+    <h3>Docker</h3>
+    <p><strong>Windows / Mac:</strong> Install <a href="https://www.docker.com/products/docker-desktop/" rel="noopener">Docker Desktop</a>. Start it and confirm the whale icon appears in your system tray before proceeding.</p>
+    <p><strong>Linux / Raspberry Pi:</strong> Use the official install script. Do <strong>not</strong> use <code>apt install docker.io</code> — that package is often severely outdated.</p>
+    <pre><code>curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+    <p>Then install the Compose plugin:</p>
+    <pre><code>sudo apt install -y docker-compose-plugin</code></pre>
+    <p>Verify both are working:</p>
+    <pre><code>docker --version
+docker compose version</code></pre>
+    <blockquote>Weave has been tested on a Raspberry Pi 5 running Raspberry Pi OS (64-bit). Docker Engine 24+ and Compose v2+ are required.</blockquote>
+
+    <h2 id="step-2">Step 2 — Forward router ports (UDP)</h2>
+    <p>mediasoup handles all WebRTC media server-side. When users speak or share audio, their browser sends UDP packets directly to your server — this does <strong>not</strong> go through any proxy. Without port forwarding, remote users won't hear anyone.</p>
+    <table>
+      <tr><th>Protocol</th><th>External port range</th><th>Internal port range</th><th>Destination</th></tr>
+      <tr><td>UDP</td><td>10000–10100</td><td>10000–10100</td><td>Your server's LAN IP</td></tr>
+    </table>
+    <p><strong>Find your server's LAN IP</strong> — Linux / Raspberry Pi: <code>hostname -I | awk '{print $1}'</code> — Windows: <code>ipconfig</code>, look for <code>IPv4 Address</code>.</p>
+    <p>Every router admin panel differs — search <a href="https://portforward.com" rel="noopener">portforward.com</a> for your router model and follow the UDP port-range guide.</p>
+    <blockquote>If you change <code>RTC_MIN_PORT</code> / <code>RTC_MAX_PORT</code> in <code>.env</code>, update the router rule to match.</blockquote>
+
+    <h2 id="step-3">Step 3 — Set up a public hostname</h2>
+    <p>mediasoup needs to tell clients where to send WebRTC packets — configured as <code>ANNOUNCED_IP</code> in <code>.env</code>. It must be reachable from the public internet.</p>
+    <h3>Option A — Static public IP</h3>
+    <pre><code>ANNOUNCED_IP=89.x.x.x</code></pre>
+    <h3>Option B — Dynamic IP (most home connections)</h3>
+    <p>Use a free dynamic DNS service like <a href="https://www.duckdns.org" rel="noopener">DuckDNS</a>: create an account, create a subdomain, and set up a cron job / scheduled task to keep it pointed at your current IP.</p>
+    <pre><code>ANNOUNCED_IP=my-weave.duckdns.org</code></pre>
+
+    <h2 id="step-4">Step 4 — Clone the repository</h2>
+    <pre><code>git clone https://github.com/CodeineZA/Weave.git
+cd Weave</code></pre>
+
+    <h2 id="step-5">Step 5 — Configure .env</h2>
+    <p>Copy the template:</p>
+    <pre><code># Linux / Raspberry Pi / Mac
+cp .env.example .env
+
+# Windows (PowerShell)
+Copy-Item .env.example .env</code></pre>
+    <table>
+      <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+      <tr><td><code>ANNOUNCED_IP</code></td><td>Yes</td><td>Your public hostname/IP for WebRTC ICE candidates</td></tr>
+      <tr><td><code>LOCAL_ANNOUNCED_IP</code></td><td>No</td><td>LAN IP, advertised as a 2nd ICE candidate for same-network clients</td></tr>
+      <tr><td><code>RTC_MIN_PORT</code></td><td>Yes</td><td>Start of UDP range — must match router rule. Default <code>10000</code></td></tr>
+      <tr><td><code>RTC_MAX_PORT</code></td><td>Yes</td><td>End of UDP range. Default <code>10100</code></td></tr>
+      <tr><td><code>HTTP_PORT</code></td><td>Yes</td><td>Host port for the web server. Default <code>3000</code></td></tr>
+      <tr><td><code>WEAVE_TUNNEL_TOKEN</code></td><td>Tunnel only</td><td>Cloudflare tunnel connector token</td></tr>
+    </table>
+    <p>Create the logs directory:</p>
+    <pre><code>mkdir -p logs</code></pre>
+
+    <h2 id="step-6">Step 6 — Optional: Cloudflare Tunnel</h2>
+    <p>A Cloudflare Tunnel lets your server reach the internet without opening any inbound TCP port on your router — Cloudflare handles HTTPS/WSS termination.</p>
+    <blockquote>Even with the tunnel, WebRTC UDP ports (10000–10100) still need router forwarding — the tunnel only carries HTTP/WebSocket signalling; media bypasses it entirely.</blockquote>
+    <ol>
+      <li>Create a free <a href="https://dash.cloudflare.com/sign-up" rel="noopener">Cloudflare account</a> and add your domain</li>
+      <li>Zero Trust dashboard → Networks → Tunnels → <strong>Create a tunnel</strong> → Cloudflared connector</li>
+      <li>Name it, save, and copy the tunnel token into <code>.env</code> as <code>WEAVE_TUNNEL_TOKEN</code></li>
+      <li>Add a Public Hostname route: Service = <code>http://weave-voice:3000</code></li>
+    </ol>
+    <p>Start with the tunnel: <code>docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d</code></p>
+    <p>Start without it: <code>docker compose up -d</code> — Weave is then reachable at <code>http://&lt;server-ip&gt;:3000</code>.</p>
+
+    <h2 id="step-7">Step 7 — Start Weave</h2>
+    <p>First startup builds the Docker image from source (2–5 minutes).</p>
+    <pre><code>docker compose up -d
+docker ps
+docker logs weave-voice --tail 50 -f   # wait for SFU_READY</code></pre>
+    <p>Access it at <code>http://localhost:3000</code>, your LAN IP, or your configured public hostname.</p>
+
+    <h2 id="step-8">Step 8 — Create the first admin user</h2>
+    <p>Registration is invite-only, and invite codes are generated by logged-in users — so the very first user has to be bootstrapped directly.</p>
+    <p><strong>8a — Create <code>bootstrap_admin.mjs</code></strong> in the repo directory:</p>
+    <pre><code>import { createUser } from '/app/db.js';
+import Database from 'better-sqlite3';
+
+const r = createUser({
+  full_name:      'YourFullName',
+  nick_name:      'YourNick',
+  password:       'YourPassword',
+  profile_picture: '🎯',
+  secret_phrase:  'A phrase only you know'
+});
+
+if (!r.ok) { console.error('Failed:', r.error); process.exit(1); }
+
+const raw = new Database('/app/data/weave.db');
+raw.prepare('UPDATE weave_users SET is_admin=1 WHERE id=?').run(r.id);
+raw.close();
+console.log('Admin user created. ID:', r.id);</code></pre>
+    <p><strong>8b — Run it inside the container:</strong></p>
+    <pre><code>docker cp bootstrap_admin.mjs weave-voice:/tmp/bootstrap_admin.mjs
+docker exec -it weave-voice node /tmp/bootstrap_admin.mjs
+rm bootstrap_admin.mjs</code></pre>
+    <p><strong>8c —</strong> Log in with your <code>full_name</code> and password, then use <strong>Invite a Friend</strong> to generate invite codes for everyone else.</p>
+
+    <h2 id="updating">Updating Weave</h2>
+    <pre><code>git pull
+docker compose build
+docker compose down
+docker compose up -d</code></pre>
+    <p>User data, messages and uploads live in a named Docker volume (<code>weave_data</code>) and persist across rebuilds. <code>docker compose down</code> does <strong>not</strong> delete volumes — only <code>docker compose down -v</code> does.</p>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+    <table>
+      <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+      <tr><td>No audio in voice channels</td><td>UDP ports not forwarded</td><td>Confirm router forwards UDP 10000–10100 to the server's LAN IP</td></tr>
+      <tr><td>Voice connects but drops / ICE failure</td><td><code>ANNOUNCED_IP</code> unreachable</td><td>Verify it resolves to your public IP and the UDP range is open</td></tr>
+      <tr><td>Page won't load at all</td><td>TCP 3000 blocked, or tunnel misconfigured</td><td>Check TCP 3000 reachability, or <code>docker logs weave-cloudflared</code></td></tr>
+      <tr><td>Container exits immediately</td><td>Config error or port conflict</td><td><code>docker logs weave-voice</code> — read the error</td></tr>
+      <tr><td>"port already in use"</td><td>Another process on 3000 / RTC range</td><td>Change <code>HTTP_PORT</code>, or stop the conflicting service</td></tr>
+      <tr><td>"Name already taken" on rejoin</td><td>Reconnect race condition</td><td>Wait a few seconds and rejoin — stale sessions clear automatically</td></tr>
+      <tr><td>First login fails after restart</td><td>Data volume may be missing</td><td>Check <code>docker volume ls</code> for <code>weave_data</code></td></tr>
+    </table>
+
+    <p style="margin-top:48px;">Stuck? <a href="index.html#contact">Get in touch</a> or open an issue on <a href="https://github.com/CodeineZA/Weave" rel="noopener">GitHub</a>.</p>
+  </article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="https://github.com/CodeineZA/Weave" rel="noopener">GitHub</a>
+      <a href="index.html">Home</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="mailto:hentusvanwyk@gmail.com">hentusvanwyk@gmail.com</a>
+    </div>
+    <div>© <span id="year"></span> Weave — free and open source.</div>
+    <div class="tagline">No trackers. No ads. No nonsense.</div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
