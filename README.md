@@ -379,6 +379,12 @@ User data, messages, and uploaded files are stored in a named Docker volume (`we
 
 ---
 
+## Contact
+
+Questions, issues, or feedback? Reach out at hentusvanwyk@gmail.com.
+
+---
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
