@@ -87,30 +87,39 @@
 <section id="why" class="alt">
   <div class="wrap">
     <div class="section-head">
-      <h2>Why we built Weave</h2>
-      <p>We didn't leave Discord because it's popular. We left because of what popularity did to it.</p>
+      <h2>Why we left Discord (an incomplete list)</h2>
+      <p>We didn't leave because it's popular. We left because it started carding us at the door — then lost the guest list.</p>
     </div>
-    <div class="why-grid">
-      <div class="why-card">
-        <span class="num">01</span>
-        <h3>Your ID isn't worth the convenience</h3>
-        <p>In October 2025, a breach at a third-party Discord support vendor exposed roughly 70,000 users' government ID photos, names and support conversations. Months later, Discord pushed a mandatory face-scan-or-ID age verification rollout anyway — before backing off after public backlash.</p>
-        <span class="src">Source: <a href="https://www.eff.org/deeplinks/2026/02/discord-voluntarily-pushes-mandatory-age-verification-despite-recent-data-breach" rel="noopener">EFF, Feb 2026</a></span>
+    <div class="why-carousel" id="whyCarousel">
+      <div class="why-viewport">
+        <div class="why-track" id="whyTrack">
+          <div class="why-card">
+            <span class="num">01</span>
+            <h3>They wanted your face. Then misplaced 70,000 of them.</h3>
+            <p>In October 2025, a breach at a third-party Discord support vendor exposed roughly 70,000 users' government ID photos, names and support conversations. Months later, Discord announced mandatory face-scan-or-ID age verification anyway — bold strategy, considering the "before" picture.</p>
+            <span class="src">Source: <a href="https://www.eff.org/deeplinks/2026/02/discord-voluntarily-pushes-mandatory-age-verification-despite-recent-data-breach" rel="noopener">EFF, Feb 2026</a></span>
+          </div>
+          <div class="why-card">
+            <span class="num">02</span>
+            <h3>Closed source, open ego</h3>
+            <p>Discord is closed-source. You can't audit what it does with your messages, you can't self-host it, and every feature ships on their timeline, under Terms of Service they can — and do — rewrite whenever it suits them. "Trust us" is not a security model.</p>
+          </div>
+          <div class="why-card">
+            <span class="num">03</span>
+            <h3>Nitro: because "free" wasn't profitable enough</h3>
+            <p>Upsells at every corner, sponsored "Quests" that track what you play so you can earn a badge, and a business model that ultimately answers to investors — not to the exhausted mods running your server for free at 2am.</p>
+          </div>
+          <div class="why-card">
+            <span class="num">04</span>
+            <h3>It's not "your" server. It's a rental with vibes.</h3>
+            <p>Your history, your community, your data — all sitting on someone else's infrastructure, one acquisition or outage away from not being yours at all. Weave runs on a box you can literally point at.</p>
+          </div>
+        </div>
       </div>
-      <div class="why-card">
-        <span class="num">02</span>
-        <h3>It's a platform, not a community tool</h3>
-        <p>Discord is closed-source. You can't audit what it does with your messages, you can't self-host it, and every feature ships on their timeline, under their Terms of Service, which they can — and do — change unilaterally.</p>
-      </div>
-      <div class="why-card">
-        <span class="num">03</span>
-        <h3>Monetization creeps into everything</h3>
-        <p>Nitro upsells, sponsored "Quests" that track your activity to unlock rewards, and a business model that ultimately answers to investors — not to the servers actually using the product every day.</p>
-      </div>
-      <div class="why-card">
-        <span class="num">04</span>
-        <h3>You never actually own it</h3>
-        <p>Your server, your history, your community's data — all of it lives on someone else's infrastructure, subject to someone else's outages, moderation calls, and business decisions. If they go down, change course, or get acquired, you have no say.</p>
+      <div class="carousel-controls">
+        <button class="carousel-arrow" id="whyPrev" aria-label="Previous reason">‹</button>
+        <div class="carousel-dots" id="whyDots"></div>
+        <button class="carousel-arrow" id="whyNext" aria-label="Next reason">›</button>
       </div>
     </div>
   </div>
@@ -120,51 +129,70 @@
   <div class="wrap">
     <div class="section-head">
       <h2>What Weave gives you instead</h2>
-      <p>Same shape as the chat app you know — voice rooms, text channels, screen share — minus everything you didn't sign up for.</p>
+      <p>Same shape as the chat app you know — voice rooms, text channels, screen share. Side by side, feature for feature, receipts included.</p>
     </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3a4 4 0 0 0-4 4v4a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z" stroke="currentColor" stroke-width="1.8"/><path d="M6 11a6 6 0 0 0 12 0M12 19v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Channel-isolated voice</h3>
-        <p>Real voice rooms with full audio isolation — you only hear the people in your channel.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 4V5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>Text chat</h3>
-        <p>Images, link previews, and paginated history — the essentials, without the noise.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <h3>Screen share with audio</h3>
-        <p>Share your screen or webcam simultaneously, with real stereo audio — no watermarks, no caps.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>Invite-only, always</h3>
-        <p>No open sign-ups, no email required, no scraping bots. You control exactly who gets in.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" opacity="0"/><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/></svg>
-        </div>
-        <h3>Private ephemeral channels</h3>
-        <p>Members can spin up invite-only rooms on demand. They self-destruct when everyone leaves — nothing lingers.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>You hold the keys</h3>
-        <p>Runs in Docker on your own machine — a Raspberry Pi is enough. Your data never leaves your hardware.</p>
-      </div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="feature">What matters</th>
+            <th class="col-weave">Weave</th>
+            <th class="col-discord">Discord</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="feature">Secure voice chat, no AI listening in on your conversations</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Your activity stays private — no broadcast status, no tracked "Quests"</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">No ID or face scan required to prove you're a person</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Fully open source — read every line yourself</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Runs on hardware you actually own</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">No Nitro paywall gating basic features</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Zero chance of your data showing up in a breach headline — because it never left your house</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Answers to your community, not to shareholders</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Private, self-destructing invite-only channels</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+          <tr>
+            <td class="feature">Screen share with real stereo audio, no caps</td>
+            <td class="mark yes">✔</td>
+            <td class="mark no">✘</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
