@@ -66,25 +66,4 @@
     goTo(0);
     start();
   }
-
-  var form = document.getElementById('contactForm');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var fromEmail = document.getElementById('fromEmail').value.trim();
-      var subject = document.getElementById('subject').value.trim();
-      var body = document.getElementById('body').value.trim();
-
-      var fullBody = body;
-      if (fromEmail) {
-        fullBody = 'From: ' + fromEmail + '\n\n' + body;
-      }
-
-      var mailto = 'mailto:hentusvanwyk@gmail.com'
-        + '?subject=' + encodeURIComponent(subject)
-        + '&body=' + encodeURIComponent(fullBody);
-
-      window.location.href = mailto;
-    });
-  }
 })();
