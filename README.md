@@ -215,7 +215,10 @@ Create the logs directory that Weave writes to:
 **Linux / Raspberry Pi / Mac:**
 ```bash
 mkdir -p logs
+sudo chown 1001:1001 logs
 ```
+
+The container runs as a non-root user (uid 1001), so it can only write to `logs/` if that user owns it. Without the `chown`, the container crashes on start with `EACCES: permission denied, mkdir '/app/logs/bug_reports'`.
 
 **Windows:**
 ```
@@ -335,15 +338,17 @@ console.log('You can now log in with your full_name and password.');
 
 **Linux / Raspberry Pi / Mac:**
 ```bash
-docker cp bootstrap_admin.mjs weave-voice:/tmp/bootstrap_admin.mjs
-docker exec -it weave-voice node /tmp/bootstrap_admin.mjs
+docker cp bootstrap_admin.mjs weave-voice:/app/bootstrap_admin.mjs
+docker exec -it weave-voice node /app/bootstrap_admin.mjs
+docker exec -u root weave-voice rm /app/bootstrap_admin.mjs
 rm bootstrap_admin.mjs
 ```
 
 **Windows (PowerShell):**
 ```powershell
-docker cp bootstrap_admin.mjs weave-voice:/tmp/bootstrap_admin.mjs
-docker exec -it weave-voice node /tmp/bootstrap_admin.mjs
+docker cp bootstrap_admin.mjs weave-voice:/app/bootstrap_admin.mjs
+docker exec -it weave-voice node /app/bootstrap_admin.mjs
+docker exec -u root weave-voice rm /app/bootstrap_admin.mjs
 Remove-Item bootstrap_admin.mjs
 ```
 
