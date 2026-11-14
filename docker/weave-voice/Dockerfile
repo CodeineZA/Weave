@@ -34,7 +34,6 @@ COPY app/server.js ./
 COPY app/db.js ./
 COPY app/package.json ./
 COPY app/public ./public
-COPY CLAUDE.md ./CLAUDE.md
 
 # Inject the browser-bundled mediasoup-client into public/
 COPY --from=builder /tmp/mediasoup-client.min.js ./public/mediasoup-client.min.js
