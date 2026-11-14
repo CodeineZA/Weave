@@ -215,7 +215,10 @@ Create the logs directory that Weave writes to:
 **Linux / Raspberry Pi / Mac:**
 ```bash
 mkdir -p logs
+sudo chown 1001:1001 logs
 ```
+
+The container runs as a non-root user (uid 1001), so it can only write to `logs/` if that user owns it. Without the `chown`, the container crashes on start with `EACCES: permission denied, mkdir '/app/logs/bug_reports'`.
 
 **Windows:**
 ```
